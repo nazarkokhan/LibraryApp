@@ -1,11 +1,11 @@
-﻿using LibraryApp.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using LibraryApp.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace LibraryApp
+namespace LibraryApp.DAL.EF
 {
-    public class DatabaseInitializer
+    public class DbInitializer
     {
         private readonly LibContext _db;
 
@@ -13,7 +13,7 @@ namespace LibraryApp
 
         private List<Author> _authors;
 
-        public DatabaseInitializer(LibContext db)
+        public DbInitializer(LibContext db)
         {
             _db = db;
         }

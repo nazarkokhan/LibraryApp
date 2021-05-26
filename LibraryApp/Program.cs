@@ -19,7 +19,7 @@ namespace LibraryApp
 
             using (var scope = host.Services.CreateScope())
             {
-                await scope.ServiceProvider.GetRequiredService<DatabaseInitializer>().InitializeAsync();
+                await scope.ServiceProvider.GetRequiredService<DatabaseInitializer>().InitializeDbAsync();
             }
 
             await host.RunAsync();

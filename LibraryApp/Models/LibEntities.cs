@@ -10,7 +10,7 @@ namespace LibraryApp.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public IEnumerable<AuthorBook> AuthorBooks { get; set; }
+        public ICollection<AuthorBook> AuthorBooks { get; set; }
     }
 
     public class Book
