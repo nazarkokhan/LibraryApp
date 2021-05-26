@@ -5,28 +5,22 @@ using System.Threading.Tasks;
 
 namespace LibraryApp.Models
 {
-    public class GetBookDto
+    public class GetAuthorDto
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
-
-        public IEnumerable<GetAuthorDto> Authors { get; set; }
     }
 
-    public class PostBookDto
+    public class CreateAuthorDto
     {
         public string Name { get; set; }
-
-        public IEnumerable<int> AuthorIds { get; set; }
     }
 
-    public class PutBookDto
+    public class PutAuthorDto
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
-
-        public IEnumerable<int> AuthorIds { get; set; }
     }
 }

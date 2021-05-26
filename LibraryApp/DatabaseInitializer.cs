@@ -63,12 +63,12 @@ namespace LibraryApp
         {
             if (!await _db.AuthorBooks.AnyAsync())
             {
-                var authorBooks = new List<AuthorBook>()
+                var authorBooks = new List<AuthorBook>
                 {
-                    new AuthorBook() {BookId = _books[0].Id, AuthorId = _authors[0].Id},
-                    new AuthorBook() {BookId = _books[0].Id, AuthorId = _authors[1].Id},
-                    new AuthorBook() {BookId = _books[1].Id, AuthorId = _authors[1].Id},
-                    new AuthorBook() {BookId = _books[2].Id, AuthorId = _authors[2].Id}
+                    new AuthorBook {BookId = _books[0].Id, AuthorId = _authors[0].Id},
+                    new AuthorBook {BookId = _books[0].Id, AuthorId = _authors[1].Id},
+                    new AuthorBook {BookId = _books[1].Id, AuthorId = _authors[1].Id},
+                    new AuthorBook {BookId = _books[2].Id, AuthorId = _authors[2].Id}
                 };
 
                 //var authorBooks = new List<AuthorBook>();

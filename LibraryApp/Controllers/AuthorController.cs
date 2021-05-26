@@ -28,7 +28,7 @@ namespace LibraryApp.Controllers
             }).ToListAsync());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<GetBookDto>> GetAuthorAsync([Required][Range(0, int.MaxValue)] int id)
         {
             var result = await _db.Authors.Where(a => a.Id == id).Select(a => new GetAuthorDto
@@ -45,8 +45,29 @@ namespace LibraryApp.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<GetAuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
+        {
+            var authorEntity = new Author
+            {
+                Name = author.Name
+            };
+
+            await _db.AddAsync(authorEntity);
+
+            await _db.SaveChangesAsync();
+
+            return Created($"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/{HttpContext.Request.Path}{authorEntity.Id}",
+                new GetAuthorDto()
+                {
+                    Id = authorEntity.Id,
+                    Name = authorEntity.Name
+                });
+        }
+
+
         [HttpPut]
-        public async Task<ActionResult<GetAuthorDto>> CreateAuthorAsync(PutAuthorDto author)
+        public async Task<ActionResult<GetAuthorDto>> UpdateAuthorAsync(PutAuthorDto author)
         {
             var authorEntity = await _db.Authors
                 .Where(a => a.Id == author.Id)
@@ -69,7 +90,7 @@ namespace LibraryApp.Controllers
         }
 
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteAuthorAsync([Required][Range(0, int.MaxValue)] int id)
         {
             var authorEntity = await _db.Authors
