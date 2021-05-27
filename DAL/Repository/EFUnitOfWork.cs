@@ -5,7 +5,7 @@ using LibraryApp.DAL.Interfaces;
 
 namespace LibraryApp.DAL.Repository
 {
-    class EFUnitOfWork : IUnitOfWork
+    public class EFUnitOfWork : IUnitOfWork
     {
         private LibContext _db;
 
@@ -20,7 +20,7 @@ namespace LibraryApp.DAL.Repository
             _db = context;
         }
 
-        public IRepository<Author> Authors
+        public IAuthorRepository Authors
         {
             get
             {
@@ -33,7 +33,7 @@ namespace LibraryApp.DAL.Repository
             }
         }
 
-        public IRepository<Book> Books
+        public IBookRepository Books
         {
             get
             {

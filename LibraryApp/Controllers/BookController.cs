@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using LibraryApp.DAL.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ namespace LibraryApp.Controllers
                     Id = ab.AuthorId,
                     Name = ab.Author.Name
                 })
-            }).ToListAsync()); // TODO: need to add pager
+            }).ToListAsync());
         }
 
         [HttpGet("{id:int}")]
@@ -89,7 +90,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<GetBookDto>> UpdateBookAsync(PutBookDto book)
+        public async Task<ActionResult<GetBookDto>> UpdateBookAsync(UpdateBookDto book)
         {
             var bookEntity = await _db.Books
                     .Where(b => b.Id == book.Id)

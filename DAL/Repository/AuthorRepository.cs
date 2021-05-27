@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using LibraryApp.DAL.DTO;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.Repository
 {
-    class AuthorRepository : IRepository<Author>
+    class AuthorRepository : IAuthorRepository
     {
-        private LibContext _db;
+        private readonly LibContext _db;
 
         public AuthorRepository(LibContext context)
         {
@@ -16,33 +19,76 @@ namespace LibraryApp.DAL.Repository
         }
 
 
-        public IEnumerable<Author> GetAll()
+        public async Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page)
         {
-            return _db.Authors;
+            var totalCount = await _db.Authors.CountAsync();
+
+            var itemsOnPage = 10;
+
+            var authors = await _db.Authors.Skip((page - 1) * itemsOnPage)
+                .Take(itemsOnPage)
+                .Select(a => new GetAuthorDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                }).ToListAsync();
+
+            return new Pager<GetAuthorDto>(authors, totalCount);
         }
 
-        public Author Get(int id)
+        public async Task<GetAuthorDto> GetAuthorAsync(int id)
         {
-            return _db.Authors.FirstOrDefault(a => a.Id == id);
-        }
-
-        public void Create(Author item)
-        {
-            _db.Authors.Add(item);
-        }
-
-        public void Update(Author item)
-        {
-            _db.Authors.Update(item);
-        }
-
-        public void Delete(int id)
-        {
-            var authorEntity = _db.Authors.FirstOrDefault(a => a.Id == id);
-            if (authorEntity != null)
+            return await _db.Authors.Where(a => a.Id == id).Select(a => new GetAuthorDto
             {
-                _db.Remove(authorEntity);
-            }
+                Id = a.Id,
+                Name = a.Name,
+            }).FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
+        {
+            var authorEntity = new Author
+            {
+                Name = author.Name
+            };
+
+            await _db.Authors.AddAsync(authorEntity);
+
+            await _db.SaveChangesAsync();
+
+            return new GetAuthorDto
+            {
+                Id = authorEntity.Id,
+                Name = authorEntity.Name
+            };
+        }
+
+        public async Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
+        {
+            var authorEntity = await _db.Authors
+                .Where(a => a.Id == author.Id)
+                .FirstOrDefaultAsync();
+
+            authorEntity.Name = author.Name;
+
+            await _db.SaveChangesAsync();
+
+            return new GetAuthorDto
+            {
+                Id = authorEntity.Id,
+                Name = authorEntity.Name
+            };
+        }
+
+        public async Task DeleteAuthorAsync(int id)
+        {
+            var authorEntity = await _db.Authors
+                .Where(a => a.Id == id)
+                .FirstOrDefaultAsync();
+
+            _db.Authors.Remove(authorEntity);
+
+            await _db.SaveChangesAsync();
         }
     }
 }

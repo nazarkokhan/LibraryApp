@@ -1,3 +1,4 @@
+using LibraryApp.BLL.Services;
 using LibraryApp.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,8 @@ namespace LibraryApp
             services
                 .AddDbContext<LibContext>((sp, options) => options.UseSqlServer(con).UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
                 .AddScoped<DatabaseInitializer>()
+                .AddTransient<AuthorService>()
+                .AddTransient<BookService>()
                 .AddControllers();
 
         }

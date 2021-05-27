@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using LibraryApp.DAL.DTO;
 using LibraryApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<GetBookDto>> GetAuthorAsync([Required][Range(0, int.MaxValue)] int id)
+        public async Task<ActionResult<GetAuthorDto>> GetAuthorAsync([Required][Range(0, int.MaxValue)] int id)
         {
             var result = await _db.Authors.Where(a => a.Id == id).Select(a => new GetAuthorDto
             {
@@ -67,7 +68,7 @@ namespace LibraryApp.Controllers
 
 
         [HttpPut]
-        public async Task<ActionResult<GetAuthorDto>> UpdateAuthorAsync(PutAuthorDto author)
+        public async Task<ActionResult<GetAuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
         {
             var authorEntity = await _db.Authors
                 .Where(a => a.Id == author.Id)

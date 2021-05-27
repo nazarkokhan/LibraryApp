@@ -5,9 +5,9 @@ namespace LibraryApp.DAL.Interfaces
 {
     interface IUnitOfWork : IDisposable
     {
-        IRepository<Author> Authors { get; }
+        IAuthorRepository Authors { get; }
 
-        IRepository<Book> Books { get; }
+        IBookRepository Books { get; }
 
         void Save();
     }

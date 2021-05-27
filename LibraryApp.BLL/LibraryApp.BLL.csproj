@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAL\LibraryApp.DAL.csproj" />
+    <ProjectReference Include="..\LibraryApp.Core\LibraryApp.Core.csproj" />
   </ItemGroup>
 
 </Project>

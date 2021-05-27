@@ -3,24 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.EF
 {
-    public class LibContext : Microsoft.EntityFrameworkCore.DbContext
+    public class LibContext : DbContext
     {
         public LibContext(DbContextOptions options) : base(options)
         {
         }
 
-        public Microsoft.EntityFrameworkCore.DbSet<Author> Authors { get; set; }
+        public DbSet<Author> Authors { get; set; }
 
-        public Microsoft.EntityFrameworkCore.DbSet<Book> Books { get; set; }
+        public DbSet<Book> Books { get; set; }
 
-        public Microsoft.EntityFrameworkCore.DbSet<AuthorBook> AuthorBooks { get; set; }
+        public DbSet<AuthorBook> AuthorBooks { get; set; }
     }
-
-    //public class LibDbInitializer : DropCreateDatabaseAlways<LibContext>
-    //{
-    //    protected override void Seed(LibContext context)
-    //    {
-    //        base.Seed(context);
-    //    }
-    //}
 }

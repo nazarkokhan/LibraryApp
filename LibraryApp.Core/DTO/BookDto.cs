@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace LibraryApp.Models
+namespace LibraryApp.DAL.DTO
 {
     public class GetBookDto
     {
@@ -16,17 +14,25 @@ namespace LibraryApp.Models
 
     public class CreateBookDto
     {
+        [Required]
+        [MinLength(1)] [MaxLength(1000)]
         public string Name { get; set; }
 
+        [Required]
         public IEnumerable<int> AuthorIds { get; set; }
     }
 
-    public class PutBookDto
+    public class UpdateBookDto
     {
+        [Required]
+        [Range(0, int.MaxValue)]
         public int Id { get; set; }
 
+        [Required]
+        [MinLength(1)][MaxLength(1000)]
         public string Name { get; set; }
 
+        [Required]
         public IEnumerable<int> AuthorIds { get; set; }
     }
 }
