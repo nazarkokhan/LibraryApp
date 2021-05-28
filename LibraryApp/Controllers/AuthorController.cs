@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
-using LibraryApp.Models;
+﻿using System.Threading.Tasks;
+using LibraryApp.BLL.Interfaces;
+using LibraryApp.Core.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.Controllers
 {
@@ -13,101 +9,41 @@ namespace LibraryApp.Controllers
     [Route("api/{controller}")]
     public class AuthorController : ControllerBase
     {
-        private readonly LibContext _db;
-        public AuthorController(LibContext context)
+        private readonly IAuthorService _authorService;
+
+        public AuthorController(IAuthorService authorService)
         {
-            _db = context;
+            _authorService = authorService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetAuthorDto>>> GetAuthorsAsync()
+        public Task<Pager<GetAuthorDto>> GetAuthorsAsync([FromQuery]int page = 1, [FromQuery]int items = 5)
         {
-            return Ok(await _db.Authors.Select(a => new GetAuthorDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-            }).ToListAsync());
+            return _authorService.GetAuthorsAsync(page, items);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<GetAuthorDto>> GetAuthorAsync([Required][Range(0, int.MaxValue)] int id)
+        [HttpGet("{id}")]
+        public Task<GetAuthorDto> GetAuthorAsync(int id)
         {
-            var result = await _db.Authors.Where(a => a.Id == id).Select(a => new GetAuthorDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-            }).FirstOrDefaultAsync();
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return _authorService.GetAuthorAsync(id);
         }
 
         [HttpPost]
-        public async Task<ActionResult<GetAuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
+        public Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
         {
-            var authorEntity = new Author
-            {
-                Name = author.Name
-            };
-
-            await _db.AddAsync(authorEntity);
-
-            await _db.SaveChangesAsync();
-
-            return Created($"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/{HttpContext.Request.Path}{authorEntity.Id}",
-                new GetAuthorDto()
-                {
-                    Id = authorEntity.Id,
-                    Name = authorEntity.Name
-                });
+            return _authorService.CreateAuthorAsync(author);
         }
-
 
         [HttpPut]
-        public async Task<ActionResult<GetAuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
+        public Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
         {
-            var authorEntity = await _db.Authors
-                .Where(a => a.Id == author.Id)
-                .FirstOrDefaultAsync();
-
-            if (authorEntity == null)
-            {
-                return NotFound();
-            }
-
-            authorEntity.Name = author.Name;
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new GetAuthorDto
-            {
-                Id = authorEntity.Id,
-                Name = authorEntity.Name
-            });
+            return _authorService.UpdateAuthorAsync(author);
         }
 
-
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteAuthorAsync([Required][Range(0, int.MaxValue)] int id)
+        [HttpDelete("{id}")]
+        public Task DeleteAuthorAsync(int id)
         {
-            var authorEntity = await _db.Authors
-                .Where(a => a.Id == id)
-                .FirstOrDefaultAsync();
-
-            if (authorEntity == null)
-            {
-                return NotFound();
-            }
-
-            _db.Authors.Remove(authorEntity);
-
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            return _authorService.DeleteAuthorAsync(id);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace LibraryApp.DAL.DTO
+namespace LibraryApp.Core.DTO
 {
     public class GetBookDto
     {

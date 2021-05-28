@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
-using LibraryApp.DAL.Entities;
+﻿using System.Threading.Tasks;
+using LibraryApp.Core.DTO;
 
 namespace LibraryApp.DAL.Interfaces
 {
     public interface IAuthorRepository
     {
-        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page);
+        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage);
 
         Task<GetAuthorDto> GetAuthorAsync(int id);
 

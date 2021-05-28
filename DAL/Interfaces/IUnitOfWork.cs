@@ -1,14 +1,13 @@
-﻿using System;
-using LibraryApp.DAL.Entities;
+﻿using System.Threading.Tasks;
 
 namespace LibraryApp.DAL.Interfaces
 {
-    interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
         IAuthorRepository Authors { get; }
 
         IBookRepository Books { get; }
 
-        void Save();
+        Task SaveAsync();
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
+using LibraryApp.Core.DTO;
 
 namespace LibraryApp.BLL.Interfaces
 {
     public interface IBookService
     {
-        Task<Pager<GetBookDto>> GetBooksAsync(int page);
+        Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage);
 
         Task<GetBookDto> GetBookAsync(int id);
 

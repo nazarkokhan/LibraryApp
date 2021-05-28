@@ -1,72 +1,24 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using LibraryApp.DAL.EF;
-using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Interfaces;
 
 namespace LibraryApp.DAL.Repository
 {
-    public class EFUnitOfWork : IUnitOfWork
+    public class EfUnitOfWork : IUnitOfWork
     {
-        private LibContext _db;
+        private readonly LibContext _db;
 
-        private AuthorRepository _authorRepository;
-
-        private BookRepository _bookRepository;
-
-        private bool _disposed = false;
-
-        public EFUnitOfWork(LibContext context)
+        public EfUnitOfWork(LibContext context, IAuthorRepository authorRepository, IBookRepository bookRepository)
         {
             _db = context;
+            Authors = authorRepository;
+            Books = bookRepository;
         }
 
-        public IAuthorRepository Authors
-        {
-            get
-            {
-                if (_authorRepository == null)
-                {
-                    _bookRepository = new BookRepository(_db);
-                }
+        public IAuthorRepository Authors { get; }
 
-                return _authorRepository;
-            }
-        }
+        public IBookRepository Books { get; }
 
-        public IBookRepository Books
-        {
-            get
-            {
-                if (_bookRepository == null)
-                {
-                    _bookRepository = new BookRepository(_db);
-                }
-
-                return _bookRepository;
-            }
-        }
-
-        public void Save()
-        {
-            _db.SaveChanges();
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this._disposed)
-            {
-                if (disposing)
-                {
-                    _db.Dispose();
-                }
-                this._disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        public Task SaveAsync() => _db.SaveChangesAsync();
     }
 }

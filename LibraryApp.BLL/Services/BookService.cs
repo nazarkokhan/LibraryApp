@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Interfaces;
-using LibraryApp.DAL.DTO;
-using LibraryApp.DAL.Repository;
+using LibraryApp.Core.DTO;
+using LibraryApp.DAL.Interfaces;
 
 namespace LibraryApp.BLL.Services
 {
     public class BookService : IBookService
     {
-        private readonly EFUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public BookService(EFUnitOfWork unitOfWork)
+        public BookService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public Task<Pager<GetBookDto>> GetBooksAsync(int page)
+        public Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage)
         {
-            return _unitOfWork.Books.GetBooksAsync(page);
+            return _unitOfWork.Books.GetBooksAsync(page, itemsOnPage);
         }
 
         public Task<GetBookDto> GetBookAsync(int id)

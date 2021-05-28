@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
+using LibraryApp.Core.DTO;
 
 namespace LibraryApp.BLL.Interfaces
 {
     public interface IAuthorService
     {
-        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page);
+        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage);
 
         Task<GetAuthorDto> GetAuthorAsync(int id);
 

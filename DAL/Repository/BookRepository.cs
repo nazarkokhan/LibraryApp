@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
+using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.Repository
 {
-    class BookRepository : IBookRepository
+    public class BookRepository : IBookRepository
     {
         private readonly LibContext _db;
 
@@ -21,13 +18,12 @@ namespace LibraryApp.DAL.Repository
         }
 
 
-        public async Task<Pager<GetBookDto>> GetBooksAsync(int page)
+        public async Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage)
         {
             var totalCount = await _db.Books.CountAsync();
 
-            var itemsOnPage = 10;
-
-            var books = await _db.Books.Skip((page - 1) * itemsOnPage)
+            var books = await _db.Books
+                .Skip((page - 1) * itemsOnPage)
                 .Take(itemsOnPage)
                 .Select(b => new GetBookDto
                 {
@@ -45,7 +41,7 @@ namespace LibraryApp.DAL.Repository
 
         public async Task<GetBookDto> GetBookAsync(int id)
         {
-            return await _db.Books.Select(b => new GetBookDto
+            var result = await _db.Books.Select(b => new GetBookDto
             {
                 Id = b.Id,
                 Name = b.Name,
@@ -53,8 +49,10 @@ namespace LibraryApp.DAL.Repository
                 {
                     Id = ab.AuthorId,
                     Name = ab.Author.Name
-                })
+                }).ToList()
             }).FirstOrDefaultAsync(b => b.Id == id);
+
+            return result;
         }
 
         public async Task<GetBookDto> CreateBookAsync(CreateBookDto book)

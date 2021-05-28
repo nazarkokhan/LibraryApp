@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LibraryApp.DAL.DTO
+namespace LibraryApp.Core.DTO
 {
     public class Pager<TData>
     {

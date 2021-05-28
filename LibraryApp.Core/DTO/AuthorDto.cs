@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LibraryApp.DAL.DTO
+namespace LibraryApp.Core.DTO
 {
     public class GetAuthorDto
     {
@@ -18,12 +18,18 @@ namespace LibraryApp.DAL.DTO
 
     public class UpdateAuthorDto
     {
+        public UpdateAuthorDto(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
         [Required]
         [Range(0, int.MaxValue)]
-        public int Id { get; set; }
+        public int Id { get; }
 
         [Required]
         [MinLength(1)] [MaxLength(1000)]
-        public string Name { get; set; }
+        public string Name { get; }
     }
 }

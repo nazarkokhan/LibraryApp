@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Interfaces;
-using LibraryApp.DAL.DTO;
-using LibraryApp.DAL.Repository;
+using LibraryApp.Core.DTO;
+using LibraryApp.DAL.Interfaces;
 
 namespace LibraryApp.BLL.Services
 {
     public class AuthorService : IAuthorService
     {
-        private readonly EFUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthorService(EFUnitOfWork unitOfWork)
+        public AuthorService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page)
+
+        public Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage)
         {
-            return _unitOfWork.Authors.GetAuthorsAsync(page);
+            return _unitOfWork.Authors.GetAuthorsAsync(page, itemsOnPage);
         }
 
         public Task<GetAuthorDto> GetAuthorAsync(int id)

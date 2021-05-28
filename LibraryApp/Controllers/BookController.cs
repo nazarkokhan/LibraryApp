@@ -1,12 +1,7 @@
-﻿using LibraryApp.Models;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
+﻿using System.Threading.Tasks;
+using LibraryApp.BLL.Interfaces;
+using LibraryApp.Core.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace LibraryApp.Controllers
 {
@@ -14,126 +9,41 @@ namespace LibraryApp.Controllers
     [Route("api/{controller}")]
     public class BookController : ControllerBase
     {
-        private readonly LibContext _db;
+        private readonly IBookService _bookService;
 
-        public BookController(LibContext context)
+        public BookController(IBookService bookService)
         {
-            _db = context;
+            _bookService = bookService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetBookDto>>> GetBooksAsync()
+        //[HttpGet("{page:int}/{items:int}")]
+        public Task<Pager<GetBookDto>> GetBooksAsync([FromQuery] int page = 1, [FromQuery] int items = 5)
         {
-            return Ok(await _db.Books.Select(b => new GetBookDto
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Authors = b.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                })
-            }).ToListAsync());
+            return _bookService.GetBooksAsync(page, items);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<GetBookDto>> GetBookAsync([Required][Range(0, int.MaxValue)] int id)
+        public Task<GetBookDto> GetBookAsync(int id)
         {
-            var result = await _db.Books.Where(b => b.Id == id).Select(b => new GetBookDto
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Authors = b.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                })
-            }).FirstOrDefaultAsync();
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return _bookService.GetBookAsync(id);
         }
 
         [HttpPost]
-        public async Task<ActionResult<GetBookDto>> CreateBookAsync(CreateBookDto book)
+        public Task<GetBookDto> CreateBookAsync(CreateBookDto book)
         {
-            var bookEntity = new Book
-            {
-                Name = book.Name,
-                AuthorBooks = book.AuthorIds.Select(aId => new AuthorBook
-                {
-                    AuthorId = aId
-                }).ToList()
-            };
-
-            await _db.Books.AddAsync(bookEntity);
-
-            await _db.SaveChangesAsync();
-
-            await _db.Entry(bookEntity).Collection(b => b.AuthorBooks).Query().Include(ab => ab.Author).LoadAsync();
-
-            return Created($"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/{HttpContext.Request.Path}{bookEntity.Id}",
-                new GetBookDto
-                {
-                    Id = bookEntity.Id,
-                    Name = bookEntity.Name,
-                    Authors = bookEntity.AuthorBooks.Select(ab => new GetAuthorDto
-                    {
-                        Id = ab.AuthorId,
-                        Name = ab.Author.Name
-                    })
-                });
+            return _bookService.CreateBookAsync(book);
         }
 
         [HttpPut]
-        public async Task<ActionResult<GetBookDto>> UpdateBookAsync(UpdateBookDto book)
+        public Task<GetBookDto> UpdateBookAsync(UpdateBookDto book)
         {
-            var bookEntity = await _db.Books
-                    .Where(b => b.Id == book.Id)
-                    .Include(b => b.AuthorBooks)
-                    .FirstAsync();
-
-            bookEntity.Name = book.Name;
-            bookEntity.AuthorBooks = book.AuthorIds.Select(aId => new AuthorBook
-            {
-                AuthorId = aId
-            }).ToList();
-
-            await _db.SaveChangesAsync();
-
-            await _db.Entry(bookEntity).Collection(b => b.AuthorBooks).Query().Include(ab => ab.Author).LoadAsync();
-
-            return Ok(new GetBookDto
-            {
-                Id = bookEntity.Id,
-                Name = bookEntity.Name,
-                Authors = bookEntity.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                })
-            });
+            return _bookService.UpdateBookAsync(book);
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteBookAsync([Required][Range(0, int.MaxValue)] int id)
+        public Task DeleteBookAsync(int id)
         {
-            var bookEntity = await _db.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
-
-            if (bookEntity == null)
-            {
-                return NotFound();
-            }
-
-            _db.Books.Remove(bookEntity);
-
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            return _bookService.DeleteBookAsync(id);
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using LibraryApp.DAL.DTO;
+﻿using System.Threading.Tasks;
+using LibraryApp.Core.DTO;
 
 namespace LibraryApp.DAL.Interfaces
 {
     public interface IBookRepository
     {
-        Task<Pager<GetBookDto>> GetBooksAsync(int page);
+        Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage);
 
         Task<GetBookDto> GetBookAsync(int id);
 
