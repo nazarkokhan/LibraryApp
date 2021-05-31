@@ -3,6 +3,7 @@ using LibraryApp.BLL.Services;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -10,28 +11,51 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
+        private IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<LibContext>(options => options.UseSqlServer(_configuration[$"ConnectionStrings:{nameof(LibContext)}"]).UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.Issuer,
+
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.Audience,
+
+                        ValidateLifetime = true,
+
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
+
+            services
+                .AddDbContext<LibContext>(options => options.UseSqlServer(Configuration[$"ConnectionStrings:{nameof(LibContext)}"]).UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
                 .AddScoped<DataBaseInitializer>()
                 .AddScoped<IUnitOfWork, EfUnitOfWork>()
                 .AddTransient<IAuthorService, AuthorService>()
                 .AddTransient<IBookService, BookService>()
+                .AddTransient<IUserService, UserService>()
                 .AddScoped<IAuthorRepository, AuthorRepository>()
                 .AddScoped<IBookRepository, BookRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
                 .AddControllers();
         }
 
@@ -45,6 +69,9 @@ namespace LibraryApp
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

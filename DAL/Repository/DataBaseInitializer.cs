@@ -14,6 +14,8 @@ namespace LibraryApp.DAL.Repository
 
         private readonly List<Author> _authors;
 
+        private readonly List<User> _users;
+
         public DataBaseInitializer(LibContext db)
         {
             _db = db;
@@ -31,6 +33,13 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = "Voina I Mir"},
                 new() {Name = "Tri Porosenka"}
             };
+
+            _users ??= new List<User>
+            {
+                new() {Login = "admin@gmail.com", Password = "admin", Admin = true},
+                new() {Login = "user@gmail.com", Password = "password"},
+                new() {Login = "guest@gmail.com", Password = null}
+            };
         }
 
         public async Task InitializeDbAsync()
@@ -40,6 +49,8 @@ namespace LibraryApp.DAL.Repository
             await InitializeAuthorsAsync();
 
             await InitializeBooksAsync();
+
+            await InitializeUserAsync();
 
             await InitializeAuthorBooksAsync();
         }
@@ -82,6 +93,16 @@ namespace LibraryApp.DAL.Repository
                 }
 
                 await _db.AuthorBooks.AddRangeAsync(authorBooks);
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        private async Task InitializeUserAsync()
+        {
+            if (!await _db.Users.AnyAsync())
+            {
+                await _db.Users.AddRangeAsync(_users);
 
                 await _db.SaveChangesAsync();
             }

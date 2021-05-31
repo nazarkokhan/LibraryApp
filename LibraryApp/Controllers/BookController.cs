@@ -16,34 +16,36 @@ namespace LibraryApp.Controllers
             _bookService = bookService;
         }
 
-        //[HttpGet("{page:int}/{items:int}")]
-        public Task<Pager<GetBookDto>> GetBooksAsync([FromQuery] int page = 1, [FromQuery] int items = 5)
+        [HttpGet("{page:int}/{items:int}")]
+        public async Task<ActionResult<Pager<GetBookDto>>> GetBooksAsync([FromQuery] string search, [FromQuery] int page = 1, [FromQuery] int items = 5)
         {
-            return _bookService.GetBooksAsync(page, items);
+            return await _bookService.GetBooksAsync(page, items);
         }
 
         [HttpGet("{id:int}")]
-        public Task<GetBookDto> GetBookAsync(int id)
+        public async Task<ActionResult<GetBookDto>> GetBookAsync(int id)
         {
-            return _bookService.GetBookAsync(id);
+            return Ok(await _bookService.GetBookAsync(id));
         }
 
         [HttpPost]
-        public Task<GetBookDto> CreateBookAsync(CreateBookDto book)
+        public async Task<ActionResult<GetBookDto>> CreateBookAsync(CreateBookDto book)
         {
-            return _bookService.CreateBookAsync(book);
+            return Ok(await _bookService.CreateBookAsync(book));
         }
 
         [HttpPut]
-        public Task<GetBookDto> UpdateBookAsync(UpdateBookDto book)
+        public async Task<ActionResult<GetBookDto>> UpdateBookAsync(UpdateBookDto book)
         {
-            return _bookService.UpdateBookAsync(book);
+            return Ok(await _bookService.UpdateBookAsync(book));
         }
 
         [HttpDelete("{id:int}")]
-        public Task DeleteBookAsync(int id)
+        public async Task<ActionResult> DeleteBookAsync(int id)
         {
-            return _bookService.DeleteBookAsync(id);
+            await _bookService.DeleteBookAsync(id);
+
+            return Ok();
         }
     }
 }

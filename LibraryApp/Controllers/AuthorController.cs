@@ -17,33 +17,35 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet]
-        public Task<Pager<GetAuthorDto>> GetAuthorsAsync([FromQuery]int page = 1, [FromQuery]int items = 5)
+        public async Task<ActionResult<Pager<GetAuthorDto>>> GetAuthorsAsync([FromQuery] string search, [FromQuery]int page = 1, [FromQuery]int items = 5)
         {
-            return _authorService.GetAuthorsAsync(page, items);
+            return Ok(await _authorService.GetAuthorsAsync(page, items));
         }
 
         [HttpGet("{id}")]
-        public Task<GetAuthorDto> GetAuthorAsync(int id)
+        public async Task<ActionResult<GetAuthorDto>> GetAuthorAsync(int id)
         {
-            return _authorService.GetAuthorAsync(id);
+            return Ok(await _authorService.GetAuthorAsync(id));
         }
 
         [HttpPost]
-        public Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
+        public async Task<ActionResult<GetAuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
         {
-            return _authorService.CreateAuthorAsync(author);
+            return Ok(await _authorService.CreateAuthorAsync(author));
         }
 
         [HttpPut]
-        public Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
+        public async Task<ActionResult<GetAuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
         {
-            return _authorService.UpdateAuthorAsync(author);
+            return Ok(await _authorService.UpdateAuthorAsync(author));
         }
 
         [HttpDelete("{id}")]
-        public Task DeleteAuthorAsync(int id)
+        public async Task<ActionResult> DeleteAuthorAsync(int id)
         {
-            return _authorService.DeleteAuthorAsync(id);
+            await _authorService.DeleteAuthorAsync(id);
+
+            return NoContent();
         }
     }
 }
