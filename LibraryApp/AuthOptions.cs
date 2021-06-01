@@ -13,6 +13,6 @@ namespace LibraryApp
 
         public const int Lifetime = 1;
 
-        public static SymmetricSecurityKey GetSymmetricSecurityKey()  => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Key));
+        public static SymmetricSecurityKey GetSymmetricSecurityKey() => new (Encoding.ASCII.GetBytes(Key));
     }
 }

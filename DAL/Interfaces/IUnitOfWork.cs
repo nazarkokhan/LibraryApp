@@ -8,8 +8,6 @@ namespace LibraryApp.DAL.Interfaces
 
         IBookRepository Books { get; }
 
-        IUserRepository Users { get; }
-
         Task SaveAsync();
     }
 }

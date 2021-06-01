@@ -1,15 +1,14 @@
 ﻿using LibraryApp.DAL.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.EF
 {
-    public class LibContext : DbContext
+    public class LibContext : IdentityDbContext<User, Role, int>
     {
-        public LibContext(DbContextOptions options) : base(options)
+        public LibContext(DbContextOptions<LibContext> options) : base(options)
         {
         }
-
-        public DbSet<User> Users { get; set; }
 
         public DbSet<Author> Authors { get; set; }
 

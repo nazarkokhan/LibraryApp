@@ -1,11 +1,13 @@
 using LibraryApp.BLL.Interfaces;
 using LibraryApp.BLL.Services;
 using LibraryApp.DAL.EF;
+using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,20 +44,25 @@ namespace LibraryApp
                         ValidateLifetime = true,
 
                         IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                        ValidateIssuerSigningKey = true,
+                        ValidateIssuerSigningKey = true
                     };
                 });
 
             services
-                .AddDbContext<LibContext>(options => options.UseSqlServer(Configuration[$"ConnectionStrings:{nameof(LibContext)}"]).UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
+                .AddIdentity<User, Role>(options => options.ConfigurePassword())
+                .AddUserManager<UserManager<User>>()
+                .AddEntityFrameworkStores<LibContext>();
+
+            services
+                .AddDbContext<LibContext>(options => options
+                    .UseSqlServer(Configuration.GetConnectionString($"{nameof(LibContext)}"))
+                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
                 .AddScoped<DataBaseInitializer>()
                 .AddScoped<IUnitOfWork, EfUnitOfWork>()
                 .AddTransient<IAuthorService, AuthorService>()
                 .AddTransient<IBookService, BookService>()
-                .AddTransient<IUserService, UserService>()
                 .AddScoped<IAuthorRepository, AuthorRepository>()
                 .AddScoped<IBookRepository, BookRepository>()
-                .AddScoped<IUserRepository, UserRepository>()
                 .AddControllers();
         }
 

@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.Repository
@@ -10,15 +14,18 @@ namespace LibraryApp.DAL.Repository
     {
         private readonly LibContext _db;
 
+        private readonly UserManager<User> _userManager;
+
         private readonly List<Book> _books;
 
         private readonly List<Author> _authors;
 
-        private readonly List<User> _users;
+        private readonly List<RegisterDto> _users;
 
-        public DataBaseInitializer(LibContext db)
+        public DataBaseInitializer(LibContext db, UserManager<User> userManager)
         {
             _db = db;
+            _userManager = userManager;
 
             _authors ??= new List<Author>
             {
@@ -34,11 +41,11 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = "Tri Porosenka"}
             };
 
-            _users ??= new List<User>
+            _users ??= new List<RegisterDto>
             {
-                new() {Login = "admin@gmail.com", Password = "admin", Admin = true},
-                new() {Login = "user@gmail.com", Password = "password"},
-                new() {Login = "guest@gmail.com", Password = null}
+                new() {Email = "admin@gmail.com", Password = "admin", Age = 99},
+                new() {Email = "guest@gmail.com", Password = "1111", Age = 99},
+                new() {Email = "user@gmail.com", Password = "password", Age = 22},
             };
         }
 
@@ -102,9 +109,14 @@ namespace LibraryApp.DAL.Repository
         {
             if (!await _db.Users.AnyAsync())
             {
-                await _db.Users.AddRangeAsync(_users);
-
-                await _db.SaveChangesAsync();
+                foreach (var u in _users)
+                {
+                    await _userManager.CreateAsync(new User
+                    {
+                        Email = u.Email,
+                        Age = u.Age
+                    }, u.Password);
+                }
             }
         }
     }

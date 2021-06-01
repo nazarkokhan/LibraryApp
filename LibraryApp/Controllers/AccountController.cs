@@ -6,70 +6,91 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Interfaces;
 using LibraryApp.Core.DTO;
+using LibraryApp.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/account")]
     public class AccountController : ControllerBase
     {
-        private readonly IUserService _user;
-        public AccountController(IUserService user)
+        private readonly UserManager<User> _userManager;
+
+        public AccountController(UserManager<User> userManager)
         {
-            _user = user;
+            _userManager = userManager;
         }
 
-        [HttpPost("/token")]
-        public ActionResult Token(LogInUserDto userInput)
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(RegisterDto register)
         {
-            var identity = GetIdentity(userInput);
+            var user = new User { Email = register.Email, UserName = register.Email, Age = register.Age };
 
-            if (identity == null)
-            {
-                return BadRequest(new {errorText = "Invalid username or password."});
-            }
+            var result = await _userManager.CreateAsync(user, register.Password);
 
+
+            return BadRequest();
+        }
+
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var id = User.FindFirst(ClaimTypes.NameIdentifier);
+            var email = User.FindFirst(ClaimTypes.Email);
+
+            return Ok();
+        }
+
+
+        [HttpPost("token")]
+        public async Task<IActionResult> Token(LogInUserDto userInput)
+        {
+            var user = await _userManager.FindByEmailAsync(userInput.Email);
+
+            if (user is null || !await _userManager.CheckPasswordAsync(user, userInput.Password))
+                return BadRequest();
+            
             var timeNow = DateTime.Now;
 
             var jwt = new JwtSecurityToken(
                 issuer: AuthOptions.Issuer,
                 audience: AuthOptions.Audience,
                 notBefore: timeNow,
-                claims: identity.Claims,
+                claims: new List<Claim>
+                {
+                    new (ClaimTypes.Email, user.Email),
+                    new (ClaimTypes.NameIdentifier, user.Id.ToString())
+                },
                 expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+
+            
+
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            var response = new
-            {
-                access_token = encodedJwt,
-                username = identity.Name
-            };
-
-            return Ok(response);
+            return Ok(encodedJwt);
         }
 
-        private ClaimsIdentity GetIdentity(LogInUserDto userInput)
+        private async Task<ClaimsIdentity> GetIdentity(LogInUserDto userInput)
         {
-            GetUserDto user = _user
-                .GetUsersPageAsync(1, int.MaxValue, null).Result.Data
-                .FirstOrDefault(u => u.Login == userInput.Login && u.Password == userInput.Password);
+            var user = await _userManager.FindByEmailAsync(userInput.Email);
 
             if (user != null)
             {
                 var claims = new List<Claim>
                 {
-                    new (ClaimsIdentity.DefaultNameClaimType, user.Login),
-                    new (ClaimsIdentity.DefaultRoleClaimType, user.Admin.ToString())
+                    new (ClaimTypes.Email, user.Email),
+                    new (ClaimTypes.NameIdentifier, user.Id.ToString())
                 };
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(
-                    claims,
-                    "Token",
-                    ClaimsIdentity.DefaultNameClaimType,
-                    ClaimsIdentity.DefaultRoleClaimType);
+                var claimsIdentity = new ClaimsIdentity(claims, "Bearer");
 
                 return claimsIdentity;
             }
