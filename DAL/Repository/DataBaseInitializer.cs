@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
@@ -43,9 +41,9 @@ namespace LibraryApp.DAL.Repository
 
             _users ??= new List<RegisterDto>
             {
-                new() {Email = "admin@gmail.com", Password = "admin", Age = 99},
-                new() {Email = "guest@gmail.com", Password = "1111", Age = 99},
-                new() {Email = "user@gmail.com", Password = "password", Age = 22},
+                new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
+                new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
+                new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
             };
         }
 
@@ -57,9 +55,9 @@ namespace LibraryApp.DAL.Repository
 
             await InitializeBooksAsync();
 
-            await InitializeUserAsync();
-
             await InitializeAuthorBooksAsync();
+
+            await InitializeUserAsync();
         }
 
         private async Task InitializeBooksAsync()
@@ -107,14 +105,15 @@ namespace LibraryApp.DAL.Repository
 
         private async Task InitializeUserAsync()
         {
-            if (!await _db.Users.AnyAsync())
+            if (!await _userManager.Users.AnyAsync())
             {
                 foreach (var u in _users)
                 {
                     await _userManager.CreateAsync(new User
                     {
                         Email = u.Email,
-                        Age = u.Age
+                        UserName = u.Email,
+                        NewAge = u.Age
                     }, u.Password);
                 }
             }

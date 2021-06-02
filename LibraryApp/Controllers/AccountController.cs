@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using LibraryApp.BLL.Interfaces;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace LibraryApp.Controllers
 {
     [ApiController]
-    [Route("api/account")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -29,28 +30,34 @@ namespace LibraryApp.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto register)
         {
-            var user = new User { Email = register.Email, UserName = register.Email, Age = register.Age };
+            var user = new User { Email = register.Email, UserName = register.Email, NewAge = register.Age };
 
-            var result = await _userManager.CreateAsync(user, register.Password);
+            var identityResult = await _userManager.CreateAsync(user, register.Password);
 
-
-            return BadRequest();
-        }
-
-
-        [Authorize]
-        [HttpGet("profile")]
-        public async Task<IActionResult> GetProfile()
-        {
-            var id = User.FindFirst(ClaimTypes.NameIdentifier);
-            var email = User.FindFirst(ClaimTypes.Email);
+            if (!identityResult.Succeeded)
+            {
+                return BadRequest();
+            }
 
             return Ok();
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("profile")]
+        public ActionResult<UserFromTokenDto> GetProfile()
+        {
+            var user = new UserFromTokenDto
+            {
+                Id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value),
+                Email = User.FindFirst(ClaimTypes.Email)!.Value
+            };
+
+            return Ok(user);
+        }
+
 
         [HttpPost("token")]
-        public async Task<IActionResult> Token(LogInUserDto userInput)
+        public async Task<ActionResult> Token(LogInUserDto userInput)
         {
             var user = await _userManager.FindByEmailAsync(userInput.Email);
 
@@ -69,33 +76,13 @@ namespace LibraryApp.Controllers
                     new (ClaimTypes.NameIdentifier, user.Id.ToString())
                 },
                 expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
-                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
             
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             return Ok(encodedJwt);
-        }
-
-        private async Task<ClaimsIdentity> GetIdentity(LogInUserDto userInput)
-        {
-            var user = await _userManager.FindByEmailAsync(userInput.Email);
-
-            if (user != null)
-            {
-                var claims = new List<Claim>
-                {
-                    new (ClaimTypes.Email, user.Email),
-                    new (ClaimTypes.NameIdentifier, user.Id.ToString())
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, "Bearer");
-
-                return claimsIdentity;
-            }
-
-            return null;
         }
     }
 }

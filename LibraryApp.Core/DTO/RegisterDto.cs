@@ -6,10 +6,11 @@ namespace LibraryApp.Core.DTO
     public class RegisterDto
     {
         [Required]
+        //[EmailAddress]
         public string Email { get; set; }
 
         [Required]
-        [Range(0, 150)]
+        //[Range(0, 150)]
         public int Age { get; set; }
 
         [Required]

@@ -39,11 +39,11 @@ namespace LibraryApp
                         ValidIssuer = AuthOptions.Issuer,
 
                         ValidateAudience = true,
-                        ValidAudience = AuthOptions.Audience,
+                         ValidAudience = AuthOptions.Audience,
 
                         ValidateLifetime = true,
 
-                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        IssuerSigningKey = AuthOptions.SymmetricSecurityKey,
                         ValidateIssuerSigningKey = true
                     };
                 });
@@ -56,7 +56,9 @@ namespace LibraryApp
             services
                 .AddDbContext<LibContext>(options => options
                     .UseSqlServer(Configuration.GetConnectionString($"{nameof(LibContext)}"))
-                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())))
+                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())));
+
+            services
                 .AddScoped<DataBaseInitializer>()
                 .AddScoped<IUnitOfWork, EfUnitOfWork>()
                 .AddTransient<IAuthorService, AuthorService>()
