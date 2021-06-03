@@ -4,6 +4,6 @@ namespace LibraryApp.DAL.Entities
 {
     public class User : IdentityUser<int>
     {
-        public int NewAge { get; set; }
+        public int Age { get; set; }
     }
 }

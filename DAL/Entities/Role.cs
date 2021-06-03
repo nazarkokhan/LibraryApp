@@ -4,6 +4,6 @@ namespace LibraryApp.DAL.Entities
 {
     public class Role : IdentityRole<int>
     {
-        public int TestRoleData { get; set; }
+        public string RoleDescription { get; set; }
     }
 }

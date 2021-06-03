@@ -11,12 +11,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
@@ -39,15 +40,31 @@ namespace LibraryApp.Controllers
         {
             var userEntity = await _userManager.FindByEmailAsync(userDto.CurrentEmail);
 
-            var token = await _userManager.GenerateChangeEmailTokenAsync(userEntity, userDto.NewEmail);
+            if (userEntity == null)
+                return BadRequest();
 
-            //userEntity.Age = userDto.Age;
+            userEntity.Email = userDto.NewEmail;
 
-            var changeEmail = await _userManager.ChangeEmailAsync(userEntity, userEntity.Email, token);
+            userEntity.UserName = userDto.NewEmail;
+
+            userEntity.Age = userDto.NewAge;
+
+            //test
+            var oldfind = await _userManager.FindByEmailAsync(userDto.CurrentEmail);
+
+            var o = oldfind.Age;
+
+            var newfind = await _userManager.FindByEmailAsync(userEntity.Email);
+
+            if (newfind != null)
+            {
+                var n = newfind.Age;
+            }
+            //testEnd
 
             var changePassword = await _userManager.ChangePasswordAsync(userEntity, userDto.CurrentPassword, userDto.NewPassword);
 
-            if (changeEmail.Succeeded && changePassword.Succeeded)
+            if (changePassword.Succeeded)
             {
                 return Ok();
             }

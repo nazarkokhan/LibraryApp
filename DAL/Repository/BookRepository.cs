@@ -17,7 +17,6 @@ namespace LibraryApp.DAL.Repository
             _db = context;
         }
 
-
         public async Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage)
         {
             var totalCount = await _db.Books.CountAsync();

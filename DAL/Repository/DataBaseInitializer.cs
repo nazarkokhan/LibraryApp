@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
@@ -14,16 +17,23 @@ namespace LibraryApp.DAL.Repository
 
         private readonly UserManager<User> _userManager;
 
+        private readonly RoleManager<Role> _roleManager;
+
         private readonly List<Book> _books;
 
         private readonly List<Author> _authors;
 
         private readonly List<RegisterDto> _users;
 
-        public DataBaseInitializer(LibContext db, UserManager<User> userManager)
+        private readonly List<Role> _roles;
+
+        public DataBaseInitializer(LibContext db, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _db = db;
+
             _userManager = userManager;
+
+            _roleManager = roleManager;
 
             _authors ??= new List<Author>
             {
@@ -37,6 +47,12 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = "Kolobok"},
                 new() {Name = "Voina I Mir"},
                 new() {Name = "Tri Porosenka"}
+            };
+
+            _roles ??= new List<Role>
+            {
+                new() {Name = "admin", RoleDescription = "Has a admin access"},
+                new() {Name = "user", RoleDescription = "Role for all registered users"}
             };
 
             _users ??= new List<RegisterDto>
@@ -57,7 +73,9 @@ namespace LibraryApp.DAL.Repository
 
             await InitializeAuthorBooksAsync();
 
-            await InitializeUserAsync();
+            await InitializeRolesAsync();
+
+            await InitializeUsersAsync();
         }
 
         private async Task InitializeBooksAsync()
@@ -94,7 +112,7 @@ namespace LibraryApp.DAL.Repository
 
                 for (var i = 0; i < count; i++)
                 {
-                    authorBooks.Add(new AuthorBook() { BookId = _books[i].Id, AuthorId = _authors[i].Id });
+                    authorBooks.Add(new AuthorBook { BookId = _books[i].Id, AuthorId = _authors[i].Id });
                 }
 
                 await _db.AuthorBooks.AddRangeAsync(authorBooks);
@@ -103,19 +121,35 @@ namespace LibraryApp.DAL.Repository
             }
         }
 
-        private async Task InitializeUserAsync()
+        private async Task InitializeRolesAsync()
+        {
+            if (!await _roleManager.Roles.AnyAsync())
+            {
+                await _roles.ForEachAsync(async r => await _roleManager.CreateAsync(r));
+            }
+        }
+
+        private async Task InitializeUsersAsync()
         {
             if (!await _userManager.Users.AnyAsync())
             {
-                foreach (var u in _users)
+                await _users.ForEachAsync(async u =>
                 {
-                    await _userManager.CreateAsync(new User
+                    var user = new User
                     {
                         Email = u.Email,
                         UserName = u.Email,
-                        NewAge = u.Age
-                    }, u.Password);
-                }
+                        Age = u.Age
+                    };
+
+                    await _userManager.CreateAsync(user, u.Password);
+
+                    if (user.Id != 1)
+                        await _userManager.AddToRoleAsync(user, "user");
+
+                    else
+                        await _userManager.AddToRoleAsync(user, "admin");
+                });
             }
         }
     }

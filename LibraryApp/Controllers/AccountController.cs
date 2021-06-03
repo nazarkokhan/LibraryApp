@@ -30,7 +30,7 @@ namespace LibraryApp.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto register)
         {
-            var user = new User { Email = register.Email, UserName = register.Email, NewAge = register.Age };
+            var user = new User { Email = register.Email, UserName = register.Email, Age = register.Age };
 
             var identityResult = await _userManager.CreateAsync(user, register.Password);
 
@@ -55,6 +55,43 @@ namespace LibraryApp.Controllers
             return Ok(user);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("reset/email")]
+        public async Task<ActionResult> ResetEmailAsync(ResetEmailDto emailDto)
+        {
+            var userEntity = await _userManager.FindByEmailAsync(emailDto.OldEmail);
+
+            var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, emailDto.NewEmail);
+
+            var changeEmail = await _userManager.ChangeEmailAsync(userEntity, emailDto.NewEmail, changeEmailToken);
+
+            if (changeEmail.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPut("reset/password")]
+        public async Task<ActionResult> ResetPasswordAsync(ResetPasswordDto userDto)
+        {
+            var userEntity = await _userManager.FindByEmailAsync(userDto.Email);
+
+            var changePasswordToken = await _userManager.GeneratePasswordResetTokenAsync(userEntity);
+
+            await _userManager.ResetPasswordAsync(userEntity, changePasswordToken, userDto.NewPassword);
+
+            var changePassword = await _userManager.ResetPasswordAsync(userEntity, changePasswordToken, userDto.NewPassword);
+
+            if (changePassword.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
 
         [HttpPost("token")]
         public async Task<ActionResult> Token(LogInUserDto userInput)
@@ -63,7 +100,7 @@ namespace LibraryApp.Controllers
 
             if (user is null || !await _userManager.CheckPasswordAsync(user, userInput.Password))
                 return BadRequest();
-            
+
             var timeNow = DateTime.Now;
 
             var jwt = new JwtSecurityToken(
@@ -73,12 +110,13 @@ namespace LibraryApp.Controllers
                 claims: new List<Claim>
                 {
                     new (ClaimTypes.Email, user.Email),
-                    new (ClaimTypes.NameIdentifier, user.Id.ToString())
+                    new (ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new (ClaimTypes.Role, _userManager.GetRolesAsync(user).Result.FirstOrDefault()!)
                 },
                 expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
                 signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
-            
+
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 

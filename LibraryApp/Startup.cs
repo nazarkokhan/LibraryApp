@@ -51,7 +51,8 @@ namespace LibraryApp
             services
                 .AddIdentity<User, Role>(options => options.ConfigurePassword())
                 .AddUserManager<UserManager<User>>()
-                .AddEntityFrameworkStores<LibContext>();
+                .AddEntityFrameworkStores<LibContext>()
+                .AddDefaultTokenProviders();
 
             services
                 .AddDbContext<LibContext>(options => options
