@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using LibraryApp.BLL.Interfaces;
+using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
-using LibraryApp.DAL.Interfaces;
+using LibraryApp.DAL.Repository.Abstraction;
 
 namespace LibraryApp.BLL.Services
 {

@@ -4,7 +4,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using LibraryApp.BLL.Interfaces;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,7 +42,7 @@ namespace LibraryApp.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("profile")]
+        [HttpGet("profile")]
         public ActionResult<UserFromTokenDto> GetProfile()
         {
             var user = new UserFromTokenDto
@@ -61,11 +60,18 @@ namespace LibraryApp.Controllers
         {
             var userEntity = await _userManager.FindByEmailAsync(emailDto.OldEmail);
 
-            var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, emailDto.NewEmail);
+            //var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, emailDto.NewEmail);
 
-            var changeEmail = await _userManager.ChangeEmailAsync(userEntity, emailDto.NewEmail, changeEmailToken);
+            //var changeEmail = await _userManager.ChangeEmailAsync(userEntity, emailDto.NewEmail, changeEmailToken);
 
-            if (changeEmail.Succeeded)
+            //if (changeEmail.Succeeded)
+            //{
+            //    return Ok();
+            //}
+
+            var setEmail = await _userManager.SetEmailAsync(userEntity, emailDto.NewEmail);
+
+            if (setEmail.Succeeded)
             {
                 return Ok();
             }
@@ -115,8 +121,6 @@ namespace LibraryApp.Controllers
                 },
                 expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
                 signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
-
-
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 

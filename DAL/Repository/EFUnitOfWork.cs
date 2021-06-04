@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.DAL.EF;
-using LibraryApp.DAL.Interfaces;
+using LibraryApp.DAL.Repository.Abstraction;
 
 namespace LibraryApp.DAL.Repository
 {

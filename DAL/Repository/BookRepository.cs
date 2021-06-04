@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
-using LibraryApp.DAL.Interfaces;
+using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.DAL.Repository

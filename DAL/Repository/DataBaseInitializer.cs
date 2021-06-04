@@ -51,8 +51,8 @@ namespace LibraryApp.DAL.Repository
 
             _roles ??= new List<Role>
             {
-                new() {Name = "admin", RoleDescription = "Has a admin access"},
-                new() {Name = "user", RoleDescription = "Role for all registered users"}
+                new() {Name = Roles.Admin, RoleDescription = "Has a admin access"},
+                new() {Name = Roles.User, RoleDescription = "Role for all registered users"}
             };
 
             _users ??= new List<RegisterDto>
@@ -145,10 +145,10 @@ namespace LibraryApp.DAL.Repository
                     await _userManager.CreateAsync(user, u.Password);
 
                     if (user.Id != 1)
-                        await _userManager.AddToRoleAsync(user, "user");
+                        await _userManager.AddToRoleAsync(user, Roles.User);
 
                     else
-                        await _userManager.AddToRoleAsync(user, "admin");
+                        await _userManager.AddToRoleAsync(user, Roles.Admin);
                 });
             }
         }

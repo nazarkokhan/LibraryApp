@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 
-namespace LibraryApp.BLL.Interfaces
+namespace LibraryApp.DAL.Repository.Abstraction
 {
-    public interface IBookService
+    public interface IBookRepository
     {
         Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage);
 

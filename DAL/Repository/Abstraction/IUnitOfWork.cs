@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace LibraryApp.DAL.Interfaces
+namespace LibraryApp.DAL.Repository.Abstraction
 {
     public interface IUnitOfWork
     {

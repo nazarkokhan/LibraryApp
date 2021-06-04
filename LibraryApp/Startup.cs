@@ -1,9 +1,10 @@
-using LibraryApp.BLL.Interfaces;
 using LibraryApp.BLL.Services;
+using LibraryApp.BLL.Services.Abstraction;
+using LibraryApp.DAL;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
-using LibraryApp.DAL.Interfaces;
+using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

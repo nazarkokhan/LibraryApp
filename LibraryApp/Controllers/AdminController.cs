@@ -29,8 +29,18 @@ namespace LibraryApp.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet("users")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersPage(string? search, int page = 1, int items = 5)
+        {
+            return Ok(await _userManager.Users
+                .Skip((page - 1) * items)
+                .Take(items)
+                .Where(u => u.UserName.Contains(search))
+                .ToListAsync());
+        }
+
         [HttpGet("users/{id:int}")]
-        public async Task<ActionResult<User>> EditUsers([Range(0, int.MaxValue)]int id)
+        public async Task<ActionResult<User>> GetUser([Range(0, int.MaxValue)]int id)
         {
             return Ok(await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id));
         }
@@ -48,6 +58,8 @@ namespace LibraryApp.Controllers
             userEntity.UserName = userDto.NewEmail;
 
             userEntity.Age = userDto.NewAge;
+
+            
 
             //test
             var oldfind = await _userManager.FindByEmailAsync(userDto.CurrentEmail);

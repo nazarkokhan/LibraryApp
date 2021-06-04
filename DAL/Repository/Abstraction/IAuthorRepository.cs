@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 
-namespace LibraryApp.BLL.Interfaces
+namespace LibraryApp.DAL.Repository.Abstraction
 {
-    public interface IAuthorService
+    public interface IAuthorRepository
     {
         Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage);
 

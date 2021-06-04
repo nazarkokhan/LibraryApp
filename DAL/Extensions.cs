@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LibraryApp.Core.DTO;
 using Microsoft.AspNetCore.Identity;
 
-namespace LibraryApp
+namespace LibraryApp.DAL
 {
-    public static class ExtensionDal
+    public static class Roles
+    {
+        public const string Admin = "admin";
+
+        public const string User = "user";
+    }
+
+    public static class Extensions
     {
         public static void ConfigurePassword(this IdentityOptions options)
         {
@@ -23,4 +31,15 @@ namespace LibraryApp
             }
         }
     }
+
+    //public class Roles
+    //{
+    //    private Roles(string value) => Value = value;
+
+    //    public string Value { get; init; }
+
+    //    public static Roles Admin => new("admin");
+
+    //    public static Roles User => new("user");
+    //}
 }
