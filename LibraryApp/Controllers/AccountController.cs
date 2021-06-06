@@ -4,14 +4,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using LibraryApp.BLL;
+using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers
 {
@@ -19,24 +20,20 @@ namespace LibraryApp.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
+        private readonly IAccountService _accountService;
+
         private readonly UserManager<User> _userManager;
 
-        public AccountController(UserManager<User> userManager)
+        public AccountController(UserManager<User> userManager, IAccountService accountService)
         {
             _userManager = userManager;
+            _accountService = accountService;
         }
 
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto register)
         {
-            var user = new User { Email = register.Email, UserName = register.Email, Age = register.Age };
-
-            var identityResult = await _userManager.CreateAsync(user, register.Password);
-
-            if (!identityResult.Succeeded)
-            {
-                return BadRequest();
-            }
+            await _accountService.RegisterAsync(register);
 
             return Ok();
         }
@@ -56,75 +53,26 @@ namespace LibraryApp.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("reset/email")]
-        public async Task<ActionResult> ResetEmailAsync(ResetEmailDto emailDto)
+        public async Task<ActionResult> ResetEmailAsync(ChangeEmailDto emailDto)
         {
-            var userEntity = await _userManager.FindByEmailAsync(emailDto.OldEmail);
+            await _accountService.ChangeEmailAsync(emailDto);
 
-            //var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, emailDto.NewEmail);
-
-            //var changeEmail = await _userManager.ChangeEmailAsync(userEntity, emailDto.NewEmail, changeEmailToken);
-
-            //if (changeEmail.Succeeded)
-            //{
-            //    return Ok();
-            //}
-
-            var setEmail = await _userManager.SetEmailAsync(userEntity, emailDto.NewEmail);
-
-            if (setEmail.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
+            return Ok();
         }
 
         [HttpPut("reset/password")]
         public async Task<ActionResult> ResetPasswordAsync(ResetPasswordDto userDto)
         {
-            var userEntity = await _userManager.FindByEmailAsync(userDto.Email);
+            await _accountService.ResetPasswordAsync(userDto);
 
-            var changePasswordToken = await _userManager.GeneratePasswordResetTokenAsync(userEntity);
-
-            await _userManager.ResetPasswordAsync(userEntity, changePasswordToken, userDto.NewPassword);
-
-            var changePassword = await _userManager.ResetPasswordAsync(userEntity, changePasswordToken, userDto.NewPassword);
-
-            if (changePassword.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
+            return Ok();
         }
 
 
-        [HttpPost("token")]
-        public async Task<ActionResult> Token(LogInUserDto userInput)
+        [HttpPost("LogIn")]
+        public async Task<ActionResult<string>> LogInAsync(LogInUserDto userDto)
         {
-            var user = await _userManager.FindByEmailAsync(userInput.Email);
-
-            if (user is null || !await _userManager.CheckPasswordAsync(user, userInput.Password))
-                return BadRequest();
-
-            var timeNow = DateTime.Now;
-
-            var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.Issuer,
-                audience: AuthOptions.Audience,
-                notBefore: timeNow,
-                claims: new List<Claim>
-                {
-                    new (ClaimTypes.Email, user.Email),
-                    new (ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new (ClaimTypes.Role, _userManager.GetRolesAsync(user).Result.FirstOrDefault()!)
-                },
-                expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
-                signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
-
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return Ok(encodedJwt);
+            return Ok(await _accountService.LogInAsync(userDto));
         }
     }
 }

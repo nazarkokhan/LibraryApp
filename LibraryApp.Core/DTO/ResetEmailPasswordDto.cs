@@ -1,6 +1,6 @@
 ﻿namespace LibraryApp.Core.DTO
 {
-    public class ResetEmailDto
+    public class ChangeEmailDto
     {
         public string OldEmail { get; set; }
 

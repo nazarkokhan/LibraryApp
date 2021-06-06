@@ -8,12 +8,12 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAdminService
     {
-        Task<IEnumerable<User>> GetUsersPage(string? search, int page = 1, int items = 5);
+        Task<IEnumerable<User>> GetUsersPageAsync(string? search, int page = 1, int items = 5);
 
-        Task<User> GetUser([Range(0, int.MaxValue)] int id);
+        Task<User> GetUserAsync([Range(0, int.MaxValue)] int id);
 
-        Task EditUser(EditUserDto userDto);
+        Task<User> EditUserAsync(EditUserDto userDto);
 
-        Task DeleteUser([Range(0, int.MaxValue)] int id);
+        Task DeleteUserAsync([Range(0, int.MaxValue)] int id);
     }
 }

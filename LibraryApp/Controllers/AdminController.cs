@@ -1,95 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/users")]
     public class AdminController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IAdminService _adminService;
 
-        public AdminController(UserManager<User> userManager)
+        public AdminController(IAdminService adminService)
         {
-            _userManager = userManager;
+            _adminService = adminService;
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersPage(string? search, int page = 1, int items = 5)
         {
-            return Ok(await _userManager.Users
-                .Skip((page - 1) * items)
-                .Take(items)
-                .Where(u => u.UserName.Contains(search))
-                .ToListAsync());
+            return Ok(await _adminService.GetUsersPageAsync(search,page,items));
         }
 
-        [HttpGet("users/{id:int}")]
-        public async Task<ActionResult<User>> GetUser([Range(0, int.MaxValue)]int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<User>> GetUser([Range(0, int.MaxValue)] int id)
         {
-            return Ok(await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id));
+            return Ok(await _adminService.GetUserAsync(id));
         }
 
-        [HttpPut("users")]
-        public async Task<ActionResult> EditUsers(EditUserDto userDto)
+        [HttpPut]
+        public async Task<ActionResult<User>> EditUsers(EditUserDto userDto)
         {
-            var userEntity = await _userManager.FindByEmailAsync(userDto.CurrentEmail);
-
-            if (userEntity == null)
-                return BadRequest();
-
-            userEntity.Email = userDto.NewEmail;
-
-            userEntity.UserName = userDto.NewEmail;
-
-            userEntity.Age = userDto.NewAge;
-
-            
-
-            //test
-            var oldfind = await _userManager.FindByEmailAsync(userDto.CurrentEmail);
-
-            var o = oldfind.Age;
-
-            var newfind = await _userManager.FindByEmailAsync(userEntity.Email);
-
-            if (newfind != null)
-            {
-                var n = newfind.Age;
-            }
-            //testEnd
-
-            var changePassword = await _userManager.ChangePasswordAsync(userEntity, userDto.CurrentPassword, userDto.NewPassword);
-
-            if (changePassword.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
+            return Ok(await _adminService.EditUserAsync(userDto));
         }
 
-        [HttpDelete("users/{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteUsers([Range(0, int.MaxValue)] int id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-            await _userManager.DeleteAsync(user);
+            await _adminService.DeleteUserAsync(id);
 
             return NoContent();
         }

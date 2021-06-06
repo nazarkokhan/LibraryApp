@@ -5,11 +5,11 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAccountService
     {
-        Task Register(RegisterDto register);
+        Task RegisterAsync(RegisterDto register);
 
-        Task<UserFromTokenDto> GetProfile();
-
-        Task ResetEmailAsync(ResetEmailDto emailDto);
+        Task<string> LogInAsync(LogInUserDto userInput);
+        
+        Task ChangeEmailAsync(ChangeEmailDto emailDto);
 
         Task ResetPasswordAsync(ResetPasswordDto userDto);
     }
