@@ -62,12 +62,16 @@ namespace LibraryApp
                     .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())));
 
             services
+                .AddHttpContextAccessor()
                 .AddScoped<DataBaseInitializer>()
                 .AddScoped<IUnitOfWork, EfUnitOfWork>()
                 .AddTransient<IAuthorService, AuthorService>()
                 .AddTransient<IBookService, BookService>()
                 .AddScoped<IAuthorRepository, AuthorRepository>()
                 .AddScoped<IBookRepository, BookRepository>()
+                .AddScoped<IAccountService, AccountService>()
+                .AddScoped<IAdminService, AdminService>()
+                .AddSingleton<IEmailService, EmailService>()
                 .AddControllers();
         }
 

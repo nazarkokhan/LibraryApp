@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.BLL.Services
@@ -15,10 +16,12 @@ namespace LibraryApp.BLL.Services
     public class AccountService : IAccountService
     {
         private readonly UserManager<User> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountService(UserManager<User> userManager)
+        public AccountService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task RegisterAsync(RegisterDto register)
@@ -55,11 +58,13 @@ namespace LibraryApp.BLL.Services
             return encodedJwt;
         }
 
-        public async Task ChangeEmailAsync(ChangeEmailDto emailDto)
+        public async Task ResetEmailAsync(ChangeEmailDto emailDto)
         {
             var userEntity = await _userManager.FindByEmailAsync(emailDto.OldEmail);
 
             var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, emailDto.NewEmail);
+
+            userEntity.UserName = emailDto.NewEmail;
 
             await _userManager.ChangeEmailAsync(userEntity, emailDto.NewEmail, changeEmailToken);
         }

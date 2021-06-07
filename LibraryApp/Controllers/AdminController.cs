@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.Controllers
 {
@@ -28,7 +25,7 @@ namespace LibraryApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersPage(string? search, int page = 1, int items = 5)
         {
-            return Ok(await _adminService.GetUsersPageAsync(search,page,items));
+            return Ok(await _adminService.GetUsersPageAsync(search, page, items));
         }
 
         [HttpGet("{id:int}")]

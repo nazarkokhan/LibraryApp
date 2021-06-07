@@ -9,7 +9,7 @@ namespace LibraryApp.BLL.Services.Abstraction
 
         Task<string> LogInAsync(LogInUserDto userInput);
         
-        Task ChangeEmailAsync(ChangeEmailDto emailDto);
+        Task ResetEmailAsync(ChangeEmailDto emailDto);
 
         Task ResetPasswordAsync(ResetPasswordDto userDto);
     }
