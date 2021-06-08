@@ -55,12 +55,12 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = Roles.User, RoleDescription = "Role for all registered users"}
             };
 
-            _users ??= new List<RegisterDto>
-            {
-                new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
-                new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
-                new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
-            };
+            // _users ??= new List<RegisterDto>
+            // {
+            //     new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
+            //     new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
+            //     new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
+            // };
         }
 
         public async Task InitializeDbAsync()

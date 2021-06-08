@@ -22,7 +22,7 @@ namespace LibraryApp.Controllers
             return Ok(await _authorService.GetAuthorsAsync(page, items));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<GetAuthorDto>> GetAuthorAsync(int id)
         {
             return Ok(await _authorService.GetAuthorAsync(id));
@@ -40,7 +40,7 @@ namespace LibraryApp.Controllers
             return Ok(await _authorService.UpdateAuthorAsync(author));
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteAuthorAsync(int id)
         {
             await _authorService.DeleteAuthorAsync(id);

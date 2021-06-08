@@ -7,7 +7,7 @@ namespace LibraryApp.Core.DTO
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; }
 
         [Required]
         [Range(0, 150)]

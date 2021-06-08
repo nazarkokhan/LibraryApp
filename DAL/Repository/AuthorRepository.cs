@@ -23,7 +23,7 @@ namespace LibraryApp.DAL.Repository
 
             var authors = await _db.Authors
                 .Skip((page - 1) * itemsOnPage)
-                .Take(itemsOnPage)
+                .Take(itemsOnPage) // TODO: do over this as pages method
                 .Select(a => new GetAuthorDto
                 {
                     Id = a.Id,
@@ -35,11 +35,15 @@ namespace LibraryApp.DAL.Repository
 
         public async Task<GetAuthorDto> GetAuthorAsync(int id)
         {
-            return await _db.Authors.Where(a => a.Id == id).Select(a => new GetAuthorDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-            }).FirstOrDefaultAsync(a => a.Id == id);
+            return await _db
+                .Authors
+                .Where(a => a.Id == id)
+                .Select(a => new GetAuthorDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                })
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public async Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
@@ -64,7 +68,7 @@ namespace LibraryApp.DAL.Repository
         {
             var authorEntity = await _db.Authors
                 .Where(a => a.Id == author.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(); // TODO: entity can be null
 
             authorEntity.Name = author.Name;
 
@@ -83,7 +87,7 @@ namespace LibraryApp.DAL.Repository
                 .Where(a => a.Id == id)
                 .FirstOrDefaultAsync();
 
-            _db.Authors.Remove(authorEntity);
+            _db.Authors.Remove(authorEntity); // TODO: entity can be null
 
             await _db.SaveChangesAsync();
         }

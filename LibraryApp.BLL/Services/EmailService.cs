@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace LibraryApp.BLL.Services
@@ -11,13 +9,12 @@ namespace LibraryApp.BLL.Services
     public class EmailService : IEmailService
     {
         private readonly SmtpClient _smtpClient;
+        
         private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _accessor;
 
-        public EmailService(IConfiguration configuration, IHttpContextAccessor accessor)
+        public EmailService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _accessor = accessor;
             _smtpClient = new SmtpClient(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]))
             {
                 EnableSsl = true,

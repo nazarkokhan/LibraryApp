@@ -20,7 +20,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet("{page:int}/{items:int}")]
-        public async Task<ActionResult<Pager<GetBookDto>>> GetBooksAsync([FromQuery] string search, [FromQuery] int page = 1, [FromQuery] int items = 5)
+        public async Task<ActionResult<Pager<GetBookDto>>> GetBooksAsync([FromQuery] string search, [FromQuery] int page = 1, [FromQuery] int items = 5) // TODO: add search implementation
         {
             return await _bookService.GetBooksAsync(page, items);
         }
