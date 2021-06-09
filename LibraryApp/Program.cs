@@ -1,13 +1,13 @@
-using System;
+using System.Threading.Tasks;
+using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.DAL.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading.Tasks;
-using LibraryApp.DAL.Repository;
 
 namespace LibraryApp
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
@@ -21,11 +21,10 @@ namespace LibraryApp
             await host.RunAsync();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+        }
     }
 }

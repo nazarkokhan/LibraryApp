@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
-using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +23,8 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsersPage(string? search, int page = 1, int items = 5)
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersPage([FromQuery] string? search,
+            [FromQuery] int page = 1, [FromQuery] int items = 5)
         {
             return Ok(await _adminService.GetUsersPageAsync(search, page, items));
         }

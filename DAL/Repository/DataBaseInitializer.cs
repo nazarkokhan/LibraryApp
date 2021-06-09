@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -15,25 +12,23 @@ namespace LibraryApp.DAL.Repository
     {
         private readonly LibContext _db;
 
-        private readonly UserManager<User> _userManager;
-
         private readonly RoleManager<Role> _roleManager;
+
+        private readonly UserManager<User> _userManager;
+        
+        private readonly List<Author> _authors;
 
         private readonly List<Book> _books;
 
-        private readonly List<Author> _authors;
+        private readonly List<Role> _roles;
 
         private readonly List<RegisterDto> _users;
 
-        private readonly List<Role> _roles;
-
-        public DataBaseInitializer(LibContext db, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public DataBaseInitializer(LibContext db, RoleManager<Role> roleManager, UserManager<User> userManager)
         {
             _db = db;
-
-            _userManager = userManager;
-
             _roleManager = roleManager;
+            _userManager = userManager;
 
             _authors ??= new List<Author>
             {
@@ -55,12 +50,12 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = Roles.User, RoleDescription = "Role for all registered users"}
             };
 
-            // _users ??= new List<RegisterDto>
-            // {
-            //     new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
-            //     new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
-            //     new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
-            // };
+            _users ??= new List<RegisterDto>
+            {
+                new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
+                new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
+                new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
+            };
         }
 
         public async Task InitializeDbAsync()
@@ -108,12 +103,10 @@ namespace LibraryApp.DAL.Repository
 
                 var bCount = await _db.Books.CountAsync();
 
-                var count = aCount >= bCount ? aCount : bCount; 
+                var count = aCount >= bCount ? aCount : bCount;
 
                 for (var i = 0; i < count; i++)
-                {
-                    authorBooks.Add(new AuthorBook { BookId = _books[i].Id, AuthorId = _authors[i].Id });
-                }
+                    authorBooks.Add(new AuthorBook {BookId = _books[i].Id, AuthorId = _authors[i].Id});
 
                 await _db.AuthorBooks.AddRangeAsync(authorBooks);
 
@@ -124,15 +117,12 @@ namespace LibraryApp.DAL.Repository
         private async Task InitializeRolesAsync()
         {
             if (!await _roleManager.Roles.AnyAsync())
-            {
                 await _roles.ForEachAsync(async r => await _roleManager.CreateAsync(r));
-            }
         }
 
         private async Task InitializeUsersAsync()
         {
             if (!await _userManager.Users.AnyAsync())
-            {
                 await _users.ForEachAsync(async u =>
                 {
                     var user = new User
@@ -150,7 +140,6 @@ namespace LibraryApp.DAL.Repository
                     else
                         await _userManager.AddToRoleAsync(user, Roles.Admin);
                 });
-            }
         }
     }
 }

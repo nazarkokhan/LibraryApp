@@ -7,7 +7,7 @@ namespace LibraryApp.DAL.Repository
     public class EfUnitOfWork : IUnitOfWork
     {
         private readonly LibContext _db;
-        
+
         public EfUnitOfWork(LibContext context, IAuthorRepository authorRepository, IBookRepository bookRepository)
         {
             _db = context;
@@ -19,6 +19,9 @@ namespace LibraryApp.DAL.Repository
 
         public IBookRepository Books { get; }
 
-        public Task SaveAsync() => _db.SaveChangesAsync();
+        public Task SaveAsync()
+        {
+            return _db.SaveChangesAsync();
+        }
     }
 }

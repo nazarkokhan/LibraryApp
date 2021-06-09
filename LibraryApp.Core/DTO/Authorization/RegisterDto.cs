@@ -1,13 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace LibraryApp.Core.DTO
+namespace LibraryApp.Core.DTO.Authorization
 {
     public class RegisterDto
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; }
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
 
         [Required]
         [Range(0, 150)]

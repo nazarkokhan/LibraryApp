@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
@@ -17,33 +19,27 @@ namespace LibraryApp.DAL.Repository
             _db = context;
         }
 
-        public async Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage)
+        public async Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int items, string? search)
         {
             var totalCount = await _db.Authors.CountAsync();
 
-            var authors = await _db.Authors
-                .Skip((page - 1) * itemsOnPage)
-                .Take(itemsOnPage) // TODO: do over this as pages method
-                .Select(a => new GetAuthorDto
-                {
-                    Id = a.Id,
-                    Name = a.Name
-                }).ToListAsync();
+            var noSearch = string.IsNullOrWhiteSpace(search);
 
-            return new Pager<GetAuthorDto>(authors, totalCount);
+            var authors = _db.Authors
+                .OrderBy(a => a.Id)
+                .TakePage(page, items)
+                .Select(a => new GetAuthorDto(a.Id, a.Name));
+
+            return noSearch ? new Pager<GetAuthorDto>(await authors.ToListAsync(), totalCount)
+                : new Pager<GetAuthorDto>(await authors.Where(u => u.Name.Contains(search!)).ToListAsync(), totalCount);
         }
 
         public async Task<GetAuthorDto> GetAuthorAsync(int id)
         {
-            return await _db
-                .Authors
-                .Where(a => a.Id == id)
-                .Select(a => new GetAuthorDto
-                {
-                    Id = a.Id,
-                    Name = a.Name,
-                })
+            var user = await _db.Authors
+                .Select(a => new GetAuthorDto(a.Id, a.Name))
                 .FirstOrDefaultAsync(a => a.Id == id);
+            return user;
         }
 
         public async Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
@@ -57,35 +53,25 @@ namespace LibraryApp.DAL.Repository
 
             await _db.SaveChangesAsync();
 
-            return new GetAuthorDto
-            {
-                Id = authorEntity.Id,
-                Name = authorEntity.Name
-            };
+            return new GetAuthorDto(authorEntity.Id, authorEntity.Name);
         }
 
         public async Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
         {
             var authorEntity = await _db.Authors
-                .Where(a => a.Id == author.Id)
-                .FirstOrDefaultAsync(); // TODO: entity can be null
+                .FirstOrDefaultAsync(a => a.Id == author.Id); // TODO: entity can be null
 
             authorEntity.Name = author.Name;
 
             await _db.SaveChangesAsync();
 
-            return new GetAuthorDto
-            {
-                Id = authorEntity.Id,
-                Name = authorEntity.Name
-            };
+            return new GetAuthorDto(authorEntity.Id, authorEntity.Name);
         }
 
         public async Task DeleteAuthorAsync(int id)
         {
             var authorEntity = await _db.Authors
-                .Where(a => a.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             _db.Authors.Remove(authorEntity); // TODO: entity can be null
 

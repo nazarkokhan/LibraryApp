@@ -14,9 +14,9 @@ namespace LibraryApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage)
+        public Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage, string? search)
         {
-            return _unitOfWork.Authors.GetAuthorsAsync(page, itemsOnPage);
+            return _unitOfWork.Authors.GetAuthorsAsync(page, itemsOnPage, search);
         }
 
         public Task<GetAuthorDto> GetAuthorAsync(int id)

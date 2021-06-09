@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using LibraryApp.Core.DTO;
 using Microsoft.AspNetCore.Identity;
 
 namespace LibraryApp.DAL
@@ -25,21 +25,19 @@ namespace LibraryApp.DAL
 
         public static async Task ForEachAsync<T>(this IEnumerable<T> enumerable, Func<T, Task> func)
         {
-            foreach (var e in enumerable)
-            {
-                await func(e);
-            }
+            foreach (var e in enumerable) await func(e);
         }
+
+        public static IQueryable<T> TakePage<T>(this IQueryable<T> queryable, int page, int items)
+        {
+            return queryable
+                .Skip((page - 1) * items)
+                .Take(items);
+        }
+        
+        // public static IQueryable<T> Search<T>(this IQueryable<T> queryable, string search)
+        // {
+        //     return queryable.Where(q => q.)
+        // }
     }
-
-    //public class Roles
-    //{
-    //    private Roles(string value) => Value = value;
-
-    //    public string Value { get; init; }
-
-    //    public static Roles Admin => new("admin");
-
-    //    public static Roles User => new("user");
-    //}
 }

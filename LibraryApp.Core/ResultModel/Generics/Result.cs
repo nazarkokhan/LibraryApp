@@ -9,7 +9,8 @@ namespace LibraryApp.Core.ResultModel.Generics
     {
         private readonly List<string> _messagesList;
 
-        public Result(bool success, TData data = default, IEnumerable<string>? messages = null, Exception? exception = null)
+        public Result(bool success, TData data = default, IEnumerable<string>? messages = null,
+            Exception? exception = null)
         {
             _messagesList = messages?.ToList() ?? new List<string>();
             Success = success;
@@ -26,13 +27,19 @@ namespace LibraryApp.Core.ResultModel.Generics
         public Exception? Exception { get; }
 
         public static Result<TData> CreateFailed(string message, Exception? exception = null)
-            => new Result<TData>(false, default!, new List<string> { message }, exception);
+        {
+            return new(false, default!, new List<string> {message}, exception);
+        }
 
         public static Result<TData> CreateFailed(IEnumerable<string> messages, Exception? exception = null)
-            => new Result<TData>(false, default!, messages, exception);
+        {
+            return new(false, default!, messages, exception);
+        }
 
         public static Result<TData> CreateSuccess(TData data)
-            => new Result<TData>(true, data);
+        {
+            return new(true, data);
+        }
 
         public Result<TData> AddError(string message)
         {

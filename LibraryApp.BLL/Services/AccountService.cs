@@ -1,26 +1,24 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using LibraryApp.BLL.Services.Abstraction;
-using LibraryApp.Core.DTO;
-using LibraryApp.DAL.Entities;
-using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using LibraryApp.BLL.Services.Abstraction;
+using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.DAL;
+using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.BLL.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly UserManager<User> _userManager;
-
         private readonly IEmailService _emailService;
-        
         private readonly IHttpContextAccessor _http;
+        private readonly UserManager<User> _userManager;
 
         public AccountService(UserManager<User> userManager, IHttpContextAccessor http, IEmailService emailService)
         {
@@ -52,14 +50,14 @@ namespace LibraryApp.BLL.Services
             var timeNow = DateTime.Now;
 
             var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.Issuer,
-                audience: AuthOptions.Audience,
+                AuthOptions.Issuer,
+                AuthOptions.Audience,
                 notBefore: timeNow,
                 claims: new List<Claim>
                 {
-                    new (ClaimTypes.Email, user.Email),
-                    new (ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new (ClaimTypes.Role, (await _userManager.GetRolesAsync(user)).FirstOrDefault()!)
+                    new(ClaimTypes.Email, user.Email),
+                    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new(ClaimTypes.Role, (await _userManager.GetRolesAsync(user)).FirstOrDefault()!)
                 },
                 expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
                 signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey,
@@ -72,18 +70,15 @@ namespace LibraryApp.BLL.Services
 
         public UserFromTokenDto GetProfile()
         {
-            if (_http.HttpContext is null)
-            {
-                throw new NotSupportedException();
-            }
+            if (_http.HttpContext is null) throw new NotSupportedException();
 
             int.TryParse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id);
-            
+
             var user = new UserFromTokenDto
             {
                 Id = id,
                 Email = _http.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value,
-                Role = _http.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value,
+                Role = _http.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value
             };
 
             return user;
@@ -93,7 +88,7 @@ namespace LibraryApp.BLL.Services
         {
             var userEntity = await _userManager
                 .FindByEmailAsync(_http.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
-            
+
             var changeEmailToken = await _userManager.GenerateChangeEmailTokenAsync(userEntity, resetEmailDto.NewEmail);
 
             await _emailService.SendAsync(userEntity.Email, changeEmailToken, "You want to change Email");
@@ -110,7 +105,7 @@ namespace LibraryApp.BLL.Services
         public async Task SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto)
         {
             var userEntity = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-            
+
             var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(userEntity);
 
             await _emailService.SendAsync(resetPasswordDto.Email, passwordResetToken, "You want to change Password");

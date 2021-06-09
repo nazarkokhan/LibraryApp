@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
-using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +28,7 @@ namespace LibraryApp.Controllers
         public async Task<ActionResult> Register(RegisterDto register)
         {
             await _accountService.RegisterAsync(register);
-            
+
             return Ok();
         }
 

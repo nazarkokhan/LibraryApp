@@ -1,38 +1,57 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace LibraryApp.Core.DTO
 {
-    public class GetBookDto
+    public class BookDto
     {
-        public int Id { get; set; }
+        public BookDto(int id, string name, IEnumerable<GetAuthorDto> authors)
+        {
+            Id = id;
+            Name = name;
+            Authors = authors;
+        }
+        public int Id { get; }
 
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public IEnumerable<GetAuthorDto> Authors { get; set; }
+        [DataMember]
+        public IEnumerable<GetAuthorDto> Authors { get; }
     }
 
     public class CreateBookDto
     {
-        [Required]
-        [MinLength(1)] [MaxLength(1000)]
-        public string Name { get; set; }
+        public CreateBookDto(string name, IEnumerable<int> authorIds)
+        {
+            Name = name;
+            AuthorIds = authorIds;
+        }
 
         [Required]
-        public IEnumerable<int> AuthorIds { get; set; }
+        [MinLength(1)]
+        [MaxLength(1000)]
+        public string Name { get; }
+
+        [Required] public IEnumerable<int> AuthorIds { get; }
     }
 
     public class UpdateBookDto
     {
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int Id { get; set; }
+        public UpdateBookDto(int id, string name, IEnumerable<int> authorIds)
+        {
+            Id = id;
+            Name = name;
+            AuthorIds = authorIds;
+        }
+
+        [Required] [Range(0, int.MaxValue)] public int Id { get; }
 
         [Required]
-        [MinLength(1)][MaxLength(1000)]
-        public string Name { get; set; }
+        [MinLength(1)]
+        [MaxLength(1000)]
+        public string Name { get; }
 
-        [Required]
-        public IEnumerable<int> AuthorIds { get; set; }
+        [Required] public IEnumerable<int> AuthorIds { get; }
     }
 }

@@ -5,13 +5,13 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IBookService
     {
-        Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage);
+        Task<Pager<BookDto>> GetBooksAsync(int page, int itemsOnPage, string? search);
 
-        Task<GetBookDto> GetBookAsync(int id);
+        Task<BookDto> GetBookAsync(int id);
 
-        Task<GetBookDto> CreateBookAsync(CreateBookDto book);
+        Task<BookDto> CreateBookAsync(CreateBookDto book);
 
-        Task<GetBookDto> UpdateBookAsync(UpdateBookDto book);
+        Task<BookDto> UpdateBookAsync(UpdateBookDto book);
 
         Task DeleteBookAsync(int id);
     }

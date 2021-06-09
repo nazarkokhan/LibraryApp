@@ -5,7 +5,7 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAuthorService
     {
-        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage);
+        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage, string? search);
 
         Task<GetAuthorDto> GetAuthorAsync(int id);
 

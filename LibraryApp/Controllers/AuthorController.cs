@@ -17,9 +17,10 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Pager<GetAuthorDto>>> GetAuthorsAsync([FromQuery] string search, [FromQuery]int page = 1, [FromQuery]int items = 5)
+        public async Task<ActionResult<Pager<GetAuthorDto>>> GetAuthorsAsync([FromQuery] string search,
+            [FromQuery] int page = 1, [FromQuery] int items = 5)
         {
-            return Ok(await _authorService.GetAuthorsAsync(page, items));
+            return Ok(await _authorService.GetAuthorsAsync(page, items, search));
         }
 
         [HttpGet("{id:int}")]

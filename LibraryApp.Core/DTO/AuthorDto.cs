@@ -4,16 +4,28 @@ namespace LibraryApp.Core.DTO
 {
     public class GetAuthorDto
     {
-        public int Id { get; set; }
+        public GetAuthorDto(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
 
-        public string Name { get; set; }
+        public int Id { get; }
+
+        public string Name { get; }
     }
 
     public class CreateAuthorDto
     {
+        public CreateAuthorDto(string name)
+        {
+            Name = name;
+        }
+
         [Required]
-        [MinLength(1)] [MaxLength(1000)]
-        public string Name { get; set; } // TODO: all DTO properties shouldn't have set accessor
+        [MinLength(1)]
+        [MaxLength(1000)]
+        public string Name { get; } // TODO: all DTO properties shouldn't have set accessor
     }
 
     public class UpdateAuthorDto
@@ -24,12 +36,13 @@ namespace LibraryApp.Core.DTO
             Name = name;
         }
 
-        [Required]
-        [Range(0, int.MaxValue)]
+        [Required] 
+        [Range(0, int.MaxValue)] 
         public int Id { get; }
 
         [Required]
-        [MinLength(1)] [MaxLength(1000)]
+        [MinLength(1)]
+        [MaxLength(1000)]
         public string Name { get; }
     }
 }

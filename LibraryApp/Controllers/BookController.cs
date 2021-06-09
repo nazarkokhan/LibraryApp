@@ -20,25 +20,26 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet("{page:int}/{items:int}")]
-        public async Task<ActionResult<Pager<GetBookDto>>> GetBooksAsync([FromQuery] string search, [FromQuery] int page = 1, [FromQuery] int items = 5) // TODO: add search implementation
+        public async Task<ActionResult<Pager<BookDto>>> GetBooksAsync([FromQuery] string? search,
+            [FromQuery] int page = 1, [FromQuery] int items = 5)
         {
-            return await _bookService.GetBooksAsync(page, items);
+            return await _bookService.GetBooksAsync(page, items, search);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<GetBookDto>> GetBookAsync(int id)
+        public async Task<ActionResult<BookDto>> GetBookAsync(int id)
         {
             return Ok(await _bookService.GetBookAsync(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<GetBookDto>> CreateBookAsync(CreateBookDto book)
+        public async Task<ActionResult<BookDto>> CreateBookAsync(CreateBookDto book)
         {
             return Ok(await _bookService.CreateBookAsync(book));
         }
 
         [HttpPut]
-        public async Task<ActionResult<GetBookDto>> UpdateBookAsync(UpdateBookDto book)
+        public async Task<ActionResult<BookDto>> UpdateBookAsync(UpdateBookDto book)
         {
             return Ok(await _bookService.UpdateBookAsync(book));
         }

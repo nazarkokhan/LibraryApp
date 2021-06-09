@@ -10,5 +10,4 @@ namespace LibraryApp.DAL.Entities
 
         public ICollection<AuthorBook> AuthorBooks { get; set; }
     }
-
 }

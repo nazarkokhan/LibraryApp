@@ -23,13 +23,19 @@ namespace LibraryApp.Core.ResultModel
         public Exception? Exception { get; }
 
         public static Result CreateSuccess()
-            => new Result(true);
+        {
+            return new(true);
+        }
 
         public static Result CreateFailed(string message, Exception? exception = null)
-            => new Result(false, new List<string> { message }, exception);
+        {
+            return new(false, new List<string> {message}, exception);
+        }
 
         public static Result CreateFailed(IEnumerable<string> messages, Exception? exception = null)
-            => new Result(false, messages, exception);
+        {
+            return new(false, messages, exception);
+        }
 
         public virtual void AddError(string message)
         {

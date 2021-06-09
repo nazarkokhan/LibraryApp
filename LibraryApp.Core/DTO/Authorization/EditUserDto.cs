@@ -1,4 +1,4 @@
-﻿namespace LibraryApp.Core.DTO
+﻿namespace LibraryApp.Core.DTO.Authorization
 {
     public class EditUserDto
     {

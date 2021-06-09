@@ -14,24 +14,22 @@ namespace LibraryApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage)
+        public Task<Pager<BookDto>> GetBooksAsync(int page, int itemsOnPage, string? search)
         {
-            return _unitOfWork.Books.GetBooksAsync(page, itemsOnPage);
+            return _unitOfWork.Books.GetBooksAsync(page, itemsOnPage, search);
         }
 
-        public Task<GetBookDto> GetBookAsync(int id)
+        public Task<BookDto> GetBookAsync(int id)
         {
             return _unitOfWork.Books.GetBookAsync(id);
         }
 
-        public Task<GetBookDto> CreateBookAsync(CreateBookDto book)
+        public Task<BookDto> CreateBookAsync(CreateBookDto book)
         {
-            
-
             return _unitOfWork.Books.CreateBookAsync(book);
         }
 
-        public Task<GetBookDto> UpdateBookAsync(UpdateBookDto book)
+        public Task<BookDto> UpdateBookAsync(UpdateBookDto book)
         {
             return _unitOfWork.Books.UpdateBookAsync(book);
         }

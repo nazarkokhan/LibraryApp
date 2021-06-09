@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.DAL.EF;
@@ -17,44 +18,41 @@ namespace LibraryApp.DAL.Repository
             _db = context;
         }
 
-        public async Task<Pager<GetBookDto>> GetBooksAsync(int page, int itemsOnPage)
+        public async Task<Pager<BookDto>> GetBooksAsync(int page, int items, string? search)
         {
             var totalCount = await _db.Books.CountAsync();
 
-            var books = await _db.Books
-                .Skip((page - 1) * itemsOnPage)
-                .Take(itemsOnPage)
-                .Select(b => new GetBookDto
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    Authors = b.AuthorBooks.Select(ab => new GetAuthorDto
-                    {
-                        Id = ab.AuthorId,
-                        Name = ab.Author.Name
-                    })
-                }).ToListAsync();
+            var noSearch = string.IsNullOrWhiteSpace(search);
 
-            return new Pager<GetBookDto>(books, totalCount);
+            var books = _db.Books
+                .OrderBy(a => a.Id)
+                .TakePage(page, items)
+                .Select(b => new BookDto(
+                    b.Id,
+                    b.Name,
+                    b.AuthorBooks.Select(ab => new GetAuthorDto(
+                        ab.AuthorId,
+                        ab.Author.Name)
+                    ))
+                );
+
+            return noSearch ? new Pager<BookDto>(await books.ToListAsync(), totalCount)
+                : new Pager<BookDto>(await books.Where(b => b.Name.Contains(search!)).ToListAsync(), totalCount);
         }
 
-        public async Task<GetBookDto> GetBookAsync(int id)
+        public async Task<BookDto> GetBookAsync(int id)
         {
-            var result = await _db.Books.Select(b => new GetBookDto
-            {
-                Id = b.Id,
-                Name = b.Name,
-                Authors = b.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                }).ToList()
-            }).FirstOrDefaultAsync(b => b.Id == id);
-
-            return result;
+            return await _db.Books.Select(b => new BookDto(
+                b.Id,
+                b.Name,
+                b.AuthorBooks.Select(ab => new GetAuthorDto(
+                    ab.AuthorId,
+                    ab.Author.Name)
+                ).ToList())
+            ).FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<GetBookDto> CreateBookAsync(CreateBookDto book)
+        public async Task<BookDto> CreateBookAsync(CreateBookDto book)
         {
             var bookEntity = new Book
             {
@@ -71,19 +69,17 @@ namespace LibraryApp.DAL.Repository
 
             await _db.Entry(bookEntity).Collection(b => b.AuthorBooks).Query().Include(ab => ab.Author).LoadAsync();
 
-            return new GetBookDto
-            {
-                Id = bookEntity.Id,
-                Name = bookEntity.Name,
-                Authors = bookEntity.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                })
-            };
+            return new BookDto(
+                bookEntity.Id,
+                bookEntity.Name,
+                bookEntity.AuthorBooks.Select(ab => new GetAuthorDto(
+                    ab.AuthorId,
+                    ab.Author.Name)
+                )
+            );
         }
 
-        public async Task<GetBookDto> UpdateBookAsync(UpdateBookDto book)
+        public async Task<BookDto> UpdateBookAsync(UpdateBookDto book)
         {
             var bookEntity = await _db.Books
                 .Include(b => b.AuthorBooks)
@@ -98,18 +94,20 @@ namespace LibraryApp.DAL.Repository
 
             await _db.SaveChangesAsync();
 
-            await _db.Entry(bookEntity).Collection(b => b.AuthorBooks).Query().Include(ab => ab.Author).LoadAsync();
+            await _db.Entry(bookEntity)
+                .Collection(b => b.AuthorBooks)
+                .Query()
+                .Include(ab => ab.Author)
+                .LoadAsync();
 
-            return new GetBookDto
-            {
-                Id = bookEntity.Id,
-                Name = bookEntity.Name,
-                Authors = bookEntity.AuthorBooks.Select(ab => new GetAuthorDto
-                {
-                    Id = ab.AuthorId,
-                    Name = ab.Author.Name
-                })
-            };
+            return new BookDto(
+                bookEntity.Id,
+                bookEntity.Name,
+                bookEntity.AuthorBooks.Select(ab => new GetAuthorDto(
+                    ab.AuthorId,
+                    ab.Author.Name)
+                )
+            );
         }
 
         public async Task DeleteBookAsync(int id)

@@ -21,12 +21,12 @@ namespace LibraryApp
 {
     public class Startup
     {
-        private IConfiguration Configuration { get; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
+
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -41,7 +41,7 @@ namespace LibraryApp
                         ValidIssuer = AuthOptions.Issuer,
 
                         ValidateAudience = true,
-                         ValidAudience = AuthOptions.Audience,
+                        ValidAudience = AuthOptions.Audience,
 
                         ValidateLifetime = true,
 
@@ -77,10 +77,7 @@ namespace LibraryApp
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
 
@@ -89,10 +86,7 @@ namespace LibraryApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

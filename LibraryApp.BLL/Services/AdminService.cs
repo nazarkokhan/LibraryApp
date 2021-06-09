@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
-using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.DAL;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +22,14 @@ namespace LibraryApp.BLL.Services
 
         public async Task<IEnumerable<User>> GetUsersPageAsync(string? search, int page = 1, int items = 5)
         {
-            return await _userManager.Users
-                .Skip((page - 1) * items)
-                .Take(items)
-                .Where(u => u.UserName.Contains(search))
-                .ToListAsync();
+            var users = _userManager.Users
+                .OrderBy(a => a.Id)
+                .TakePage(page, items);
+            
+            var noSearch = string.IsNullOrWhiteSpace(search);
+            
+            return noSearch ? await users.ToListAsync()
+                : await users.Where(u => u.UserName.Contains(search!) || u.Email.Contains(search!)).ToListAsync();
         }
 
         public async Task<User> GetUserAsync([Range(0, int.MaxValue)] int id)

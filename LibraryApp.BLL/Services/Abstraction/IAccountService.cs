@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Authorization;
 
 namespace LibraryApp.BLL.Services.Abstraction
 {
@@ -10,9 +10,9 @@ namespace LibraryApp.BLL.Services.Abstraction
         Task<string> GetAccessTokenAsync(LogInUserDto userInput);
 
         UserFromTokenDto GetProfile();
-        
+
         Task SendEmailResetTokenAsync(ResetEmailDto resetEmailDto);
-        
+
         Task ResetEmailAsync(TokenEmailDto tokenEmailDto);
 
         Task SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);

@@ -5,7 +5,7 @@ namespace LibraryApp.DAL.Repository.Abstraction
 {
     public interface IAuthorRepository
     {
-        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage);
+        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int items, string? search);
 
         Task<GetAuthorDto> GetAuthorAsync(int id);
 
