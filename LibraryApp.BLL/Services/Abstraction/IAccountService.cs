@@ -1,22 +1,24 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 
 namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAccountService
     {
-        Task RegisterAsync(RegisterDto register);
+        Task<Result> RegisterAsync(RegisterDto register);
 
-        Task<string> GetAccessTokenAsync(LogInUserDto userInput);
+        Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput);
 
-        UserFromTokenDto GetProfile();
+        Result<UserFromTokenDto> GetProfile();
 
-        Task SendEmailResetTokenAsync(ResetEmailDto resetEmailDto);
+        Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto);
 
-        Task ResetEmailAsync(TokenEmailDto tokenEmailDto);
+        Task<Result> ResetEmailAsync(TokenEmailDto tokenEmailDto);
 
-        Task SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);
+        Task<Result> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);
 
-        Task ResetPasswordAsync(TokenPasswordDto tokenPasswordDto);
+        Task<Result> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto);
     }
 }

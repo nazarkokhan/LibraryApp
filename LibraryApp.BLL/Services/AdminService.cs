@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.Extensions;
 using LibraryApp.DAL;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -25,11 +26,11 @@ namespace LibraryApp.BLL.Services
             var users = _userManager.Users
                 .OrderBy(a => a.Id)
                 .TakePage(page, items);
-            
-            var noSearch = string.IsNullOrWhiteSpace(search);
-            
-            return noSearch ? await users.ToListAsync()
-                : await users.Where(u => u.UserName.Contains(search!) || u.Email.Contains(search!)).ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                users = users.Where(u => u.UserName.Contains(search!) || u.Email.Contains(search!));
+
+            return await users.ToListAsync();
         }
 
         public async Task<User> GetUserAsync([Range(0, int.MaxValue)] int id)

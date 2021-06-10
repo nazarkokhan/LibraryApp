@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace LibraryApp.Core.DTO
 {
@@ -10,6 +11,7 @@ namespace LibraryApp.Core.DTO
             TotalCount = totalCount;
         }
 
+        [DataMember]
         public IReadOnlyCollection<TData> Data { get; }
 
         public long TotalCount { get; }

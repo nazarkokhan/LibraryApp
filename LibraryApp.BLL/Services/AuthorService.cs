@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Repository.Abstraction;
 
 namespace LibraryApp.BLL.Services
@@ -14,27 +16,27 @@ namespace LibraryApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage, string? search)
+        public Task<Result<Pager<AuthorDto>>> GetAuthorsAsync(int page, int itemsOnPage, string? search)
         {
             return _unitOfWork.Authors.GetAuthorsAsync(page, itemsOnPage, search);
         }
 
-        public Task<GetAuthorDto> GetAuthorAsync(int id)
+        public Task<Result<AuthorDto>> GetAuthorAsync(int id)
         {
             return _unitOfWork.Authors.GetAuthorAsync(id);
         }
 
-        public Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
+        public Task<Result<AuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
         {
             return _unitOfWork.Authors.CreateAuthorAsync(author);
         }
 
-        public Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
+        public Task<Result<AuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
         {
             return _unitOfWork.Authors.UpdateAuthorAsync(author);
         }
 
-        public Task DeleteAuthorAsync(int id)
+        public Task<Result> DeleteAuthorAsync(int id)
         {
             return _unitOfWork.Authors.DeleteAuthorAsync(id);
         }

@@ -19,7 +19,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> LogInAsync(LogInUserDto userDto)
+        public async Task<ActionResult<Token>> LogInAsync(LogInUserDto userDto)
         {
             return Ok(await _accountService.GetAccessTokenAsync(userDto));
         }

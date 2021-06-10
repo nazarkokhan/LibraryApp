@@ -1,18 +1,20 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 
 namespace LibraryApp.DAL.Repository.Abstraction
 {
     public interface IBookRepository
     {
-        Task<Pager<BookDto>> GetBooksAsync(int page, int itemsOnPage, string? search);
+        Task<Result<Pager<BookDto>>> GetBooksAsync(int page, int itemsOnPage, string? search);
 
-        Task<BookDto> GetBookAsync(int id);
+        Task<Result<BookDto>> GetBookAsync(int id);
 
-        Task<BookDto> CreateBookAsync(CreateBookDto book);
+        Task<Result<BookDto>> CreateBookAsync(CreateBookDto book);
 
-        Task<BookDto> UpdateBookAsync(UpdateBookDto book);
+        Task<Result<BookDto>> UpdateBookAsync(UpdateBookDto book);
 
-        Task DeleteBookAsync(int id);
+        Task<Result> DeleteBookAsync(int id);
     }
 }

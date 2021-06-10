@@ -2,11 +2,21 @@
 {
     public class ResetEmailDto
     {
-        public string NewEmail { get; set; }
+        public ResetEmailDto(string newEmail)
+        {
+            NewEmail = newEmail;
+        }
+
+        public string NewEmail { get; }
     }
 
     public class ResetPasswordDto
     {
-        public string Email { get; set; }
+        public ResetPasswordDto(string email)
+        {
+            Email = email;
+        }
+
+        public string Email { get; }
     }
 }

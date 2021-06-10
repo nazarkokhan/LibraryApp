@@ -6,7 +6,7 @@ namespace LibraryApp.Core.DTO
 {
     public class BookDto
     {
-        public BookDto(int id, string name, IEnumerable<GetAuthorDto> authors)
+        public BookDto(int id, string name, IEnumerable<AuthorDto> authors)
         {
             Id = id;
             Name = name;
@@ -17,7 +17,7 @@ namespace LibraryApp.Core.DTO
         public string Name { get; }
 
         [DataMember]
-        public IEnumerable<GetAuthorDto> Authors { get; }
+        public IEnumerable<AuthorDto> Authors { get; }
     }
 
     public class CreateBookDto
@@ -33,7 +33,8 @@ namespace LibraryApp.Core.DTO
         [MaxLength(1000)]
         public string Name { get; }
 
-        [Required] public IEnumerable<int> AuthorIds { get; }
+        [Required] 
+        public IEnumerable<int> AuthorIds { get; }
     }
 
     public class UpdateBookDto
@@ -45,13 +46,16 @@ namespace LibraryApp.Core.DTO
             AuthorIds = authorIds;
         }
 
-        [Required] [Range(0, int.MaxValue)] public int Id { get; }
+        [Required] 
+        [Range(0, int.MaxValue)] 
+        public int Id { get; }
 
         [Required]
         [MinLength(1)]
         [MaxLength(1000)]
         public string Name { get; }
 
-        [Required] public IEnumerable<int> AuthorIds { get; }
+        [Required] 
+        public IEnumerable<int> AuthorIds { get; }
     }
 }

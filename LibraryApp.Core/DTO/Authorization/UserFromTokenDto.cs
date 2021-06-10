@@ -2,10 +2,17 @@
 {
     public class UserFromTokenDto
     {
-        public int Id { get; init; }
+        public UserFromTokenDto(int id, string email, string role)
+        {
+            Id = id;
+            Email = email;
+            Role = role;
+        }
 
-        public string Email { get; init; }
+        public int Id { get; }
 
-        public string Role { get; init; }
+        public string Email { get; }
+
+        public string Role { get; }
     }
 }

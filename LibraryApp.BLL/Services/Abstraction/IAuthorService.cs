@@ -1,18 +1,20 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 
 namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAuthorService
     {
-        Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int itemsOnPage, string? search);
+        Task<Result<Pager<AuthorDto>>> GetAuthorsAsync(int page, int itemsOnPage, string? search);
 
-        Task<GetAuthorDto> GetAuthorAsync(int id);
+        Task<Result<AuthorDto>> GetAuthorAsync(int id);
 
-        Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author);
+        Task<Result<AuthorDto>> CreateAuthorAsync(CreateAuthorDto author);
 
-        Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author);
+        Task<Result<AuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author);
 
-        Task DeleteAuthorAsync(int id);
+        Task<Result> DeleteAuthorAsync(int id);
     }
 }

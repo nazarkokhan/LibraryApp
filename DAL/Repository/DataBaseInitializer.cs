@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.Extensions;
+using LibraryApp.Core.ResultConstants;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace LibraryApp.DAL.Repository
 {
@@ -23,12 +26,15 @@ namespace LibraryApp.DAL.Repository
         private readonly List<Role> _roles;
 
         private readonly List<RegisterDto> _users;
+        
+        private readonly IHostEnvironment _hostEnvironment;
 
-        public DataBaseInitializer(LibContext db, RoleManager<Role> roleManager, UserManager<User> userManager)
+        public DataBaseInitializer(LibContext db, RoleManager<Role> roleManager, UserManager<User> userManager, IHostEnvironment hostEnvironment)
         {
             _db = db;
             _roleManager = roleManager;
             _userManager = userManager;
+            _hostEnvironment = hostEnvironment;
 
             _authors ??= new List<Author>
             {
@@ -52,25 +58,28 @@ namespace LibraryApp.DAL.Repository
 
             _users ??= new List<RegisterDto>
             {
-                new() {Email = "admin@gmail.com", Password = "adminAccess", Age = 99},
-                new() {Email = "guest@gmail.com", Password = "guestAccess", Age = 99},
-                new() {Email = "user@gmail.com", Password = "userAccess", Age = 99},
+                new("admin@gmail.com", "adminAccess", 99),
+                new("guest@gmail.com", "guestAccess", 99),
+                new("user@gmail.com", "userAccess", 99)
             };
         }
 
         public async Task InitializeDbAsync()
         {
-            await _db.Database.EnsureCreatedAsync();
+            if (_hostEnvironment.IsDevelopment())
+            {
+                await _db.Database.EnsureCreatedAsync();
 
-            await InitializeAuthorsAsync();
+                await InitializeAuthorsAsync();
 
-            await InitializeBooksAsync();
+                await InitializeBooksAsync();
 
-            await InitializeAuthorBooksAsync();
+                await InitializeAuthorBooksAsync();
 
-            await InitializeRolesAsync();
+                await InitializeRolesAsync();
 
-            await InitializeUsersAsync();
+                await InitializeUsersAsync();
+            }
         }
 
         private async Task InitializeBooksAsync()

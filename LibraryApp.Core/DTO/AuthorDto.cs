@@ -2,9 +2,9 @@
 
 namespace LibraryApp.Core.DTO
 {
-    public class GetAuthorDto
+    public class AuthorDto
     {
-        public GetAuthorDto(int id, string name)
+        public AuthorDto(int id, string name)
         {
             Id = id;
             Name = name;

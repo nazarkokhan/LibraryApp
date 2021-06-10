@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/[controller]")]
     public class BookController : ControllerBase
@@ -19,11 +19,11 @@ namespace LibraryApp.Controllers
             _bookService = bookService;
         }
 
-        [HttpGet("{page:int}/{items:int}")]
+        [HttpGet]
         public async Task<ActionResult<Pager<BookDto>>> GetBooksAsync([FromQuery] string? search,
             [FromQuery] int page = 1, [FromQuery] int items = 5)
         {
-            return await _bookService.GetBooksAsync(page, items, search);
+            return Ok(await _bookService.GetBooksAsync(page, items, search));
         }
 
         [HttpGet("{id:int}")]
@@ -49,7 +49,7 @@ namespace LibraryApp.Controllers
         {
             await _bookService.DeleteBookAsync(id);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

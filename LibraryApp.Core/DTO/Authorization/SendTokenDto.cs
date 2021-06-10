@@ -2,17 +2,30 @@
 {
     public class TokenEmailDto
     {
-        public string Token { get; set; }
+        public TokenEmailDto(string token, string newEmail)
+        {
+            Token = token;
+            NewEmail = newEmail;
+        }
 
-        public string NewEmail { get; set; }
+        public string Token { get; }
+
+        public string NewEmail { get; }
     }
 
     public class TokenPasswordDto
     {
-        public string Token { get; set; }
+        public TokenPasswordDto(string token, string newPassword, string email)
+        {
+            Token = token;
+            NewPassword = newPassword;
+            Email = email;
+        }
 
-        public string NewPassword { get; set; }
+        public string Token { get; }
 
-        public string Email { get; set; }
+        public string NewPassword { get; }
+
+        public string Email { get; }
     }
 }

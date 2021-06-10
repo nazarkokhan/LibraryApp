@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.Extensions;
+using LibraryApp.Core.ResultConstants;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository.Abstraction;
@@ -19,63 +23,130 @@ namespace LibraryApp.DAL.Repository
             _db = context;
         }
 
-        public async Task<Pager<GetAuthorDto>> GetAuthorsAsync(int page, int items, string? search)
+        public async Task<Result<Pager<AuthorDto>>> GetAuthorsAsync(int page, int items, string? search)
         {
-            var totalCount = await _db.Authors.CountAsync();
-
-            var noSearch = string.IsNullOrWhiteSpace(search);
-
-            var authors = _db.Authors
-                .OrderBy(a => a.Id)
-                .TakePage(page, items)
-                .Select(a => new GetAuthorDto(a.Id, a.Name));
-
-            return noSearch ? new Pager<GetAuthorDto>(await authors.ToListAsync(), totalCount)
-                : new Pager<GetAuthorDto>(await authors.Where(u => u.Name.Contains(search!)).ToListAsync(), totalCount);
-        }
-
-        public async Task<GetAuthorDto> GetAuthorAsync(int id)
-        {
-            var user = await _db.Authors
-                .Select(a => new GetAuthorDto(a.Id, a.Name))
-                .FirstOrDefaultAsync(a => a.Id == id);
-            return user;
-        }
-
-        public async Task<GetAuthorDto> CreateAuthorAsync(CreateAuthorDto author)
-        {
-            var authorEntity = new Author
+            try
             {
-                Name = author.Name
-            };
+                var totalCount = await _db.Authors.CountAsync();
 
-            await _db.Authors.AddAsync(authorEntity);
+                var authors = _db.Authors
+                    .OrderBy(a => a.Id)
+                    .TakePage(page, items);
 
-            await _db.SaveChangesAsync();
+                if (string.IsNullOrWhiteSpace(search))
+                    authors = authors.Where(a => a.Name.Contains(search!));
 
-            return new GetAuthorDto(authorEntity.Id, authorEntity.Name);
+                return Result<Pager<AuthorDto>>.CreateSuccess(
+                    new Pager<AuthorDto>(
+                        await authors
+                            .Select(a => new AuthorDto(a.Id, a.Name))
+                            .ToListAsync(), totalCount
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                return Result<Pager<AuthorDto>>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
 
-        public async Task<GetAuthorDto> UpdateAuthorAsync(UpdateAuthorDto author)
+        public async Task<Result<AuthorDto>> GetAuthorAsync(int id)
         {
-            var authorEntity = await _db.Authors
-                .FirstOrDefaultAsync(a => a.Id == author.Id); // TODO: entity can be null
+            try
+            {
+                var author = await _db.Authors
+                    .Where(a => a.Id == id)
+                    .Select(a => new AuthorDto(a.Id, a.Name))
+                    .FirstOrDefaultAsync();
 
-            authorEntity.Name = author.Name;
-
-            await _db.SaveChangesAsync();
-
-            return new GetAuthorDto(authorEntity.Id, authorEntity.Name);
+                return author is null
+                    ? Result<AuthorDto>.CreateFailed("Author with such Id does`nt exist", new NullReferenceException())
+                    : Result<AuthorDto>.CreateSuccess(author);
+            }
+            catch (Exception e)
+            {
+                return Result<AuthorDto>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
 
-        public async Task DeleteAuthorAsync(int id)
+        public async Task<Result<AuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
         {
-            var authorEntity = await _db.Authors
-                .FirstOrDefaultAsync(a => a.Id == id);
+            try
+            {
+                var authorEntity = new Author
+                {
+                    Name = author.Name
+                };
 
-            _db.Authors.Remove(authorEntity); // TODO: entity can be null
+                await _db.Authors.AddAsync(authorEntity);
 
-            await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
+
+                return Result<AuthorDto>.CreateSuccess(
+                    new AuthorDto(
+                        authorEntity.Id,
+                        authorEntity.Name
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                return Result<AuthorDto>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
+        }
+
+        public async Task<Result<AuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
+        {
+            try
+            {
+                var authorEntity = await _db.Authors
+                    .FirstOrDefaultAsync(a => a.Id == author.Id); // TODO: entity can be null
+
+                if (authorEntity is null)
+                {
+                    return Result<AuthorDto>.CreateFailed("Author with such Id does`nt exist",
+                        new NullReferenceException());
+                }
+
+                authorEntity.Name = author.Name;
+
+                await _db.SaveChangesAsync();
+
+                return Result<AuthorDto>.CreateSuccess(
+                    new AuthorDto(
+                        authorEntity.Id,
+                        authorEntity.Name
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                return Result<AuthorDto>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
+        }
+
+        public async Task<Result> DeleteAuthorAsync(int id)
+        {
+            try
+            {
+                var authorEntity = await _db.Authors
+                    .FirstOrDefaultAsync(a => a.Id == id);
+
+                if (authorEntity is null)
+                {
+                    return Result.CreateFailed("Author with such Id does`nt exist", new NullReferenceException());
+                }
+
+                _db.Authors.Remove(authorEntity);
+
+                await _db.SaveChangesAsync();
+
+                return Result.CreateSuccess();
+            }
+            catch (Exception e)
+            {
+                return Result.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
     }
 }
