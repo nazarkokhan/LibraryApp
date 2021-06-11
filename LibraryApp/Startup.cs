@@ -2,11 +2,11 @@ using LibraryApp.BLL;
 using LibraryApp.BLL.Services;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.Extensions;
-using LibraryApp.DAL;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Repository.Abstraction;
+using LibraryApp.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -73,7 +73,7 @@ namespace LibraryApp
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IAdminService, AdminService>()
                 .AddSingleton<IEmailService, EmailService>()
-                .AddControllers();
+                .AddControllers(options => options.Filters.Add<ErrorableResultFilterAttribute>());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

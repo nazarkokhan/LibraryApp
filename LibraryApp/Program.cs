@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.DAL.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

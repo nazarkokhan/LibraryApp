@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers
@@ -18,38 +17,38 @@ namespace LibraryApp.Controllers
         {
             _authorService = authorService;
         }
-
+        
         [HttpGet]
-        public async Task<ActionResult<Pager<AuthorDto>>> GetAuthorsAsync([FromQuery] string? search,
-            [FromQuery] int page = 1, [FromQuery] int items = 5)
+        public async Task<IActionResult> GetAuthorsAsync(
+            [FromQuery] string? search,
+            [FromQuery] [Range(1, int.MaxValue)] int page = 1, 
+            [FromQuery] int items = 5)
         {
-            return Ok(await _authorService.GetAuthorsAsync(page, items, search));
+            return (await _authorService.GetAuthorsAsync(page, items, search)).ToActionResult();
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<AuthorDto>> GetAuthorAsync(int id)
+        public async Task<IActionResult> GetAuthorAsync([Range(0, int.MaxValue)] int id)
         {
-            return Ok(await _authorService.GetAuthorAsync(id));
+            return (await _authorService.GetAuthorAsync(id)).ToActionResult();
         }
 
         [HttpPost]
-        public async Task<ActionResult<AuthorDto>> CreateAuthorAsync(CreateAuthorDto author)
+        public async Task<IActionResult> CreateAuthorAsync(CreateAuthorDto author)
         {
-            return Ok(await _authorService.CreateAuthorAsync(author));
+            return (await _authorService.CreateAuthorAsync(author)).ToActionResult();
         }
 
         [HttpPut]
-        public async Task<ActionResult<AuthorDto>> UpdateAuthorAsync(UpdateAuthorDto author)
+        public async Task<IActionResult> UpdateAuthorAsync(UpdateAuthorDto author)
         {
-            return Ok(await _authorService.UpdateAuthorAsync(author));
+            return (await _authorService.UpdateAuthorAsync(author)).ToActionResult();
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteAuthorAsync(int id)
+        public async Task<IActionResult> DeleteAuthorAsync([Range(0, int.MaxValue)] int id)
         {
-            await _authorService.DeleteAuthorAsync(id);
-
-            return NoContent();
+            return (await _authorService.DeleteAuthorAsync(id)).ToActionResult();
         }
     }
 }

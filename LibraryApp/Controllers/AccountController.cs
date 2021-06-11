@@ -19,60 +19,48 @@ namespace LibraryApp.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<Token>> LogInAsync(LogInUserDto userDto)
+        public async Task<IActionResult> LogInAsync(LogInUserDto userDto)
         {
-            return Ok(await _accountService.GetAccessTokenAsync(userDto));
+            return (await _accountService.GetAccessTokenAsync(userDto)).ToActionResult();
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register(RegisterDto register)
+        public async Task<IActionResult> Register(RegisterDto register)
         {
-            await _accountService.RegisterAsync(register);
-
-            return Ok();
+            return (await _accountService.RegisterAsync(register)).ToActionResult();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("profile")]
-        public ActionResult<UserFromTokenDto> GetProfile()
+        public IActionResult GetProfile()
         {
-            var user = _accountService.GetProfile();
-
-            return Ok(user);
+            return (_accountService.GetProfile()).ToActionResult();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("reset/email/token")]
-        public async Task<ActionResult> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto)
+        public async Task<IActionResult> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto)
         {
-            await _accountService.SendEmailResetTokenAsync(resetEmailDto);
-
-            return Ok();
+            return (await _accountService.SendEmailResetTokenAsync(resetEmailDto)).ToActionResult();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("reset/email")]
-        public async Task<ActionResult> ResetEmailAsync(TokenEmailDto tokenEmailDto)
+        public async Task<IActionResult> ResetEmailAsync(TokenEmailDto tokenEmailDto)
         {
-            await _accountService.ResetEmailAsync(tokenEmailDto);
-
-            return Ok();
+            return (await _accountService.ResetEmailAsync(tokenEmailDto)).ToActionResult();
         }
 
         [HttpGet("reset/password/token")]
-        public async Task<ActionResult> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto)
         {
-            await _accountService.SendPasswordResetTokenAsync(resetPasswordDto);
-
-            return Ok();
+            return (await _accountService.SendPasswordResetTokenAsync(resetPasswordDto)).ToActionResult();
         }
 
         [HttpPut("reset/password")]
-        public async Task<ActionResult> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto)
+        public async Task<IActionResult> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto)
         {
-            await _accountService.ResetPasswordAsync(tokenPasswordDto);
-
-            return Ok();
+            return (await _accountService.ResetPasswordAsync(tokenPasswordDto)).ToActionResult();
         }
     }
 }

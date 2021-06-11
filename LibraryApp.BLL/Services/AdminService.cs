@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
+using LibraryApp.Core.DTO;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.Extensions;
-using LibraryApp.DAL;
+using LibraryApp.Core.ResultConstants;
+using LibraryApp.Core.ResultConstants.AuthorizationConstants;
+using LibraryApp.Core.ResultModel;
+using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,43 +25,104 @@ namespace LibraryApp.BLL.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<User>> GetUsersPageAsync(string? search, int page = 1, int items = 5)
+        public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page = 1, int items = 5)
         {
-            var users = _userManager.Users
-                .OrderBy(a => a.Id)
-                .TakePage(page, items);
+            try
+            {
+                var totalCount = await _userManager.Users.CountAsync();
 
-            if (!string.IsNullOrWhiteSpace(search))
-                users = users.Where(u => u.UserName.Contains(search!) || u.Email.Contains(search!));
+                var userEntities = _userManager.Users
+                    .OrderBy(a => a.Id)
+                    .TakePage(page, items);
 
-            return await users.ToListAsync();
+                if (!string.IsNullOrWhiteSpace(search))
+                    userEntities = userEntities
+                        .Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
+
+                return Result<Pager<User>>.CreateSuccess(
+                    new Pager<User>(
+                        await userEntities.ToListAsync(),
+                        totalCount
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                return Result<Pager<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
 
-        public async Task<User> GetUserAsync([Range(0, int.MaxValue)] int id)
+        public async Task<Result<User>> GetUserAsync([Range(0, int.MaxValue)] int id)
         {
-            return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            try
+            {
+                var userEntity = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                return userEntity is null
+                    ? Result<User>.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    )
+                    : Result<User>.CreateSuccess(userEntity);
+            }
+            catch (Exception e)
+            {
+                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
 
-        public async Task<User> EditUserAsync(EditUserDto userDto)
+        public async Task<Result<User>> EditUserAsync(EditUserDto userDto)
         {
-            var userEntity = await _userManager.FindByEmailAsync(userDto.CurrentEmail);
+            try
+            {
+                var userEntity = await _userManager
+                    .FindByEmailAsync(userDto.CurrentEmail);
 
-            userEntity.Email = userDto.NewEmail;
+                if (userEntity is null)
+                    return Result<User>.CreateFailed("User does`nt exist", new NullReferenceException());
 
-            userEntity.UserName = userDto.NewEmail;
+                userEntity.Email = userDto.NewEmail;
 
-            userEntity.Age = userDto.NewAge;
+                userEntity.UserName = userDto.NewEmail;
 
-            await _userManager.ChangePasswordAsync(userEntity, userDto.CurrentPassword, userDto.NewPassword);
+                userEntity.Age = userDto.NewAge;
 
-            return userEntity;
+                await _userManager.RemovePasswordAsync(userEntity);
+
+                var addPass = await _userManager.AddPasswordAsync(userEntity, userDto.NewPassword);
+
+                return !addPass.Succeeded
+                    ? Result<User>.CreateFailed("Error adding new password")
+                    : Result<User>.CreateSuccess(userEntity);
+            }
+            catch (Exception e)
+            {
+                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
 
-        public async Task DeleteUserAsync([Range(0, int.MaxValue)] int id)
+        public async Task<Result> DeleteUserAsync([Range(0, int.MaxValue)] int id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+            try
+            {
+                var userEntity = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.Id == id);
 
-            await _userManager.DeleteAsync(user);
+                if (userEntity is null)
+                    return Result.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
+
+                await _userManager.DeleteAsync(userEntity);
+
+                return Result.CreateSuccess();
+            }
+            catch (Exception e)
+            {
+                return Result.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
         }
     }
 }

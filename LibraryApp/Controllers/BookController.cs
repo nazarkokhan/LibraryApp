@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers
@@ -20,36 +19,36 @@ namespace LibraryApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Pager<BookDto>>> GetBooksAsync([FromQuery] string? search,
-            [FromQuery] int page = 1, [FromQuery] int items = 5)
+        public async Task<IActionResult> GetBooksAsync(
+            [FromQuery] string? search,
+            [FromQuery] [Range(1, int.MaxValue)] int page = 1,
+            [FromQuery] int items = 5)
         {
-            return Ok(await _bookService.GetBooksAsync(page, items, search));
+            return (await _bookService.GetBooksAsync(page, items, search)).ToActionResult();
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<BookDto>> GetBookAsync(int id)
+        public async Task<IActionResult> GetBookAsync([Range(0, int.MaxValue)] int id)
         {
-            return Ok(await _bookService.GetBookAsync(id));
+            return (await _bookService.GetBookAsync(id)).ToActionResult();
         }
 
         [HttpPost]
-        public async Task<ActionResult<BookDto>> CreateBookAsync(CreateBookDto book)
+        public async Task<IActionResult> CreateBookAsync(CreateBookDto book)
         {
-            return Ok(await _bookService.CreateBookAsync(book));
+            return (await _bookService.CreateBookAsync(book)).ToActionResult();
         }
 
         [HttpPut]
-        public async Task<ActionResult<BookDto>> UpdateBookAsync(UpdateBookDto book)
+        public async Task<IActionResult> UpdateBookAsync(UpdateBookDto book)
         {
-            return Ok(await _bookService.UpdateBookAsync(book));
+            return (await _bookService.UpdateBookAsync(book)).ToActionResult();
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteBookAsync(int id)
+        public async Task<IActionResult> DeleteBookAsync([Range(0, int.MaxValue)] int id)
         {
-            await _bookService.DeleteBookAsync(id);
-
-            return NoContent();
+            return (await _bookService.DeleteBookAsync(id)).ToActionResult();
         }
     }
 }

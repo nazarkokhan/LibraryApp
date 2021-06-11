@@ -2,7 +2,7 @@
 
 namespace LibraryApp.Core.Extensions
 {
-    public static class Extensions
+    public static class Extensions2
     {
         public static void ConfigurePassword(this IdentityOptions options)
         {

@@ -33,8 +33,9 @@ namespace LibraryApp.DAL.Repository
                     .OrderBy(a => a.Id)
                     .TakePage(page, items);
 
-                if (string.IsNullOrWhiteSpace(search))
-                    authors = authors.Where(a => a.Name.Contains(search!));
+                if (!string.IsNullOrWhiteSpace(search))
+                    authors = authors
+                        .Where(a => a.Name.Contains(search));
 
                 return Result<Pager<AuthorDto>>.CreateSuccess(
                     new Pager<AuthorDto>(
@@ -60,7 +61,10 @@ namespace LibraryApp.DAL.Repository
                     .FirstOrDefaultAsync();
 
                 return author is null
-                    ? Result<AuthorDto>.CreateFailed("Author with such Id does`nt exist", new NullReferenceException())
+                    ? Result<AuthorDto>.CreateFailed(
+                        AuthorRepositoryResultConstants.AuthorNotFound,
+                        new NullReferenceException()
+                    )
                     : Result<AuthorDto>.CreateSuccess(author);
             }
             catch (Exception e)
@@ -104,8 +108,10 @@ namespace LibraryApp.DAL.Repository
 
                 if (authorEntity is null)
                 {
-                    return Result<AuthorDto>.CreateFailed("Author with such Id does`nt exist",
-                        new NullReferenceException());
+                    return Result<AuthorDto>.CreateFailed(
+                        AuthorRepositoryResultConstants.AuthorNotFound,
+                        new NullReferenceException()
+                    );
                 }
 
                 authorEntity.Name = author.Name;
@@ -133,9 +139,10 @@ namespace LibraryApp.DAL.Repository
                     .FirstOrDefaultAsync(a => a.Id == id);
 
                 if (authorEntity is null)
-                {
-                    return Result.CreateFailed("Author with such Id does`nt exist", new NullReferenceException());
-                }
+                    return Result.CreateFailed(
+                        AuthorRepositoryResultConstants.AuthorNotFound,
+                        new NullReferenceException()
+                    );
 
                 _db.Authors.Remove(authorEntity);
 

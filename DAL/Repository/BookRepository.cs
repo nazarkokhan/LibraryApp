@@ -34,7 +34,8 @@ namespace LibraryApp.DAL.Repository
                     .TakePage(page, items);
 
                 if (!string.IsNullOrWhiteSpace(search))
-                    books = books.Where(b => b.Name.Contains(search));
+                    books = books
+                        .Where(b => b.Name.Contains(search));
 
                 return Result<Pager<BookDto>>.CreateSuccess(
                     new Pager<BookDto>(await books.Select(b => new BookDto(
@@ -44,7 +45,8 @@ namespace LibraryApp.DAL.Repository
                             ab.AuthorId,
                             ab.Author.Name)
                         ))
-                    ).ToListAsync(), totalCount));
+                    ).ToListAsync(), totalCount)
+                );
             }
             catch (Exception e)
             {
@@ -68,7 +70,10 @@ namespace LibraryApp.DAL.Repository
                     ).FirstOrDefaultAsync();
 
                 return book is null
-                    ? Result<BookDto>.CreateFailed("Book with such Id does`nt exist", new NullReferenceException())
+                    ? Result<BookDto>.CreateFailed(
+                        BookRepositoryResultConstants.BookNotFound,
+                        new NullReferenceException()
+                    )
                     : Result<BookDto>.CreateSuccess(book);
             }
             catch (Exception e)
@@ -126,8 +131,10 @@ namespace LibraryApp.DAL.Repository
 
                 if (bookEntity is null)
                 {
-                    return Result<BookDto>.CreateFailed("Book with such Id does`nt exist",
-                        new NullReferenceException());
+                    return Result<BookDto>.CreateFailed(
+                        BookRepositoryResultConstants.BookNotFound,
+                        new NullReferenceException()
+                    );
                 }
 
                 bookEntity.Name = book.Name;
@@ -153,7 +160,8 @@ namespace LibraryApp.DAL.Repository
                             ab.AuthorId,
                             ab.Author.Name)
                         )
-                    ));
+                    )
+                );
             }
             catch (Exception e)
             {
@@ -169,14 +177,16 @@ namespace LibraryApp.DAL.Repository
 
                 if (bookEntity is null)
                 {
-                    return Result.CreateFailed("Book with such Id does`nt exist",
-                        new NullReferenceException());
+                    return Result.CreateFailed(
+                        BookRepositoryResultConstants.BookNotFound,
+                        new NullReferenceException()
+                    );
                 }
-                
+
                 _db.Books.Remove(bookEntity);
 
                 await _db.SaveChangesAsync();
-                
+
                 return Result.CreateSuccess();
             }
             catch (Exception e)

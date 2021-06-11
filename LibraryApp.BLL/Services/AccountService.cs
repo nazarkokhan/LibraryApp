@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.ResultConstants;
+using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
-using LibraryApp.DAL;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +43,6 @@ namespace LibraryApp.BLL.Services
                 await _emailService.SendAsync(
                     user.Email,
                     "You have successfully created your account in library!",
-                    
                     $"Thanks for your registration, {user.UserName}."
                 );
 
@@ -62,10 +61,13 @@ namespace LibraryApp.BLL.Services
                 var user = await _userManager.FindByEmailAsync(userInput.Email);
 
                 if (user is null)
-                    return Result<Token>.CreateFailed("", new NullReferenceException());
+                    return Result<Token>.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
                 if (!await _userManager.CheckPasswordAsync(user, userInput.Password))
-                    return Result<Token>.CreateFailed("Wrong password");
+                    return Result<Token>.CreateFailed(AuthServiceResultConstants.InvalidUserNameOrPassword);
 
                 var timeNow = DateTime.Now;
 
@@ -98,7 +100,10 @@ namespace LibraryApp.BLL.Services
             try
             {
                 if (_http.HttpContext is null)
-                    return Result<UserFromTokenDto>.CreateFailed("", new NotSupportedException());
+                    return Result<UserFromTokenDto>.CreateFailed(
+                        "HttpContext is NULL",
+                        new NotSupportedException()
+                    );
 
                 var user = new UserFromTokenDto(
                     int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!),
@@ -122,14 +127,22 @@ namespace LibraryApp.BLL.Services
                     .FindByEmailAsync(_http.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
 
                 if (userEntity is null)
-                    return Result.CreateFailed("User does`nt exist", new NullReferenceException());
+                    return Result.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
-                var changeEmailToken =
-                    await _userManager.GenerateChangeEmailTokenAsync(userEntity, resetEmailDto.NewEmail);
+                var changeEmailToken = await _userManager
+                    .GenerateChangeEmailTokenAsync(userEntity, resetEmailDto.NewEmail);
 
                 // var htmlToken = $"https://localhost:5001/api/account/reset/email?newEmail={resetEmailDto.NewEmail}";
-                
-                await _emailService.SendAsync(userEntity.Email, changeEmailToken, "You want to change Email");
+
+                await _emailService
+                    .SendAsync(
+                        userEntity.Email,
+                        changeEmailToken,
+                        EmailServiceAuthorizationConstants.ConfirmEmailReset
+                    );
 
                 return Result.CreateSuccess();
             }
@@ -147,13 +160,16 @@ namespace LibraryApp.BLL.Services
                     .FindByEmailAsync(_http.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
 
                 if (userEntity is null)
-                    return Result.CreateFailed("User does`nt exist", new NullReferenceException());
+                    return Result.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
-                var changeEmail =
-                    await _userManager.ChangeEmailAsync(userEntity, tokenEmailDto.NewEmail, tokenEmailDto.Token);
+                var changeEmail = await _userManager
+                    .ChangeEmailAsync(userEntity, tokenEmailDto.NewEmail, tokenEmailDto.Token);
 
                 return !changeEmail.Succeeded
-                    ? Result.CreateFailed("Error changing email")
+                    ? Result.CreateFailed(AuthServiceResultConstants.InvalidResetEmailToken)
                     : Result.CreateSuccess();
             }
             catch (Exception e)
@@ -170,12 +186,19 @@ namespace LibraryApp.BLL.Services
                     .FindByEmailAsync(resetPasswordDto.Email);
 
                 if (userEntity is null)
-                    return Result.CreateFailed("User does`nt exist", new NullReferenceException());
+                    return Result.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
-                var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(userEntity);
+                var passwordResetToken = await _userManager
+                    .GeneratePasswordResetTokenAsync(userEntity);
 
-                await _emailService.SendAsync(resetPasswordDto.Email, passwordResetToken,
-                    "You want to change Password");
+                await _emailService.SendAsync(
+                    resetPasswordDto.Email,
+                    passwordResetToken,
+                    EmailServiceAuthorizationConstants.ConfirmPasswordReset
+                );
 
                 return Result.CreateSuccess();
             }
@@ -189,19 +212,23 @@ namespace LibraryApp.BLL.Services
         {
             try
             {
-                var userEntity = await _userManager.FindByEmailAsync(tokenPasswordDto.Email);
+                var userEntity = await _userManager
+                    .FindByEmailAsync(tokenPasswordDto.Email);
 
-                if(userEntity is null)
-                    return Result.CreateFailed("User does`nt exist", new NullReferenceException());
-                
+                if (userEntity is null)
+                    return Result.CreateFailed(
+                        AuthServiceResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
+
                 var resetPassword = await _userManager.ResetPasswordAsync(
                     userEntity,
                     $"{tokenPasswordDto.Token}",
                     tokenPasswordDto.NewPassword
                 );
 
-                return !resetPassword.Succeeded 
-                    ? Result.CreateFailed("Error resetting password") 
+                return !resetPassword.Succeeded
+                    ? Result.CreateFailed(AuthServiceResultConstants.InvalidResetPasswordToken)
                     : Result.CreateSuccess();
             }
             catch (Exception e)

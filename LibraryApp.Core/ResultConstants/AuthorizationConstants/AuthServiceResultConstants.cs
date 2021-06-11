@@ -1,4 +1,4 @@
-﻿namespace LibraryApp.Core.ResultConstants
+﻿namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
 {
     public static class AuthServiceResultConstants
     {
@@ -21,6 +21,11 @@
         /// Represents message when user sent invalid code for password resetting.
         /// </summary>
         public const string InvalidResetPasswordToken = "IVALID_RESET_PASSWORD_TOKEN";
+        
+        /// <summary>
+        /// Represents message when user sent invalid code for email resetting.
+        /// </summary>
+        public const string InvalidResetEmailToken = "IVALID_RESET_EMAIL_TOKEN";
 
         /// <summary>
         /// Represents message when refresh token is not valid.
