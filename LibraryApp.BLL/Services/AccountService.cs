@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
+using LibraryApp.Core;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.ResultConstants;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
@@ -36,14 +37,29 @@ namespace LibraryApp.BLL.Services
             {
                 var user = new User {Email = register.Email, UserName = register.Email, Age = register.Age};
 
-                await _userManager.CreateAsync(user, register.Password);
+                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
+                await _emailService.SendAsync(
+                    to: user.Email,
+                    body: $"Your confirmation token:\n {emailConfirmationToken}",
+                    subject: AccountEmailServiceConstants.ConfirmRegistration
+                );
+
+                var tokenIsValid = await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
+
+                if (user.EmailConfirmed)
+                {
+                    await _userManager.CreateAsync(user, register.Password);
+                }
+
+                await _userManager.CreateAsync(user, register.Password);
+                
                 await _userManager.AddToRoleAsync(user, Roles.User);
 
                 await _emailService.SendAsync(
-                    user.Email,
-                    "You have successfully created your account in library!",
-                    $"Thanks for your registration, {user.UserName}."
+                    to: user.Email,
+                    body: "You have successfully created your account in library!",
+                    subject: AccountEmailServiceConstants.RegistrationConfirmed
                 );
 
                 return Result.CreateSuccess();
@@ -141,7 +157,7 @@ namespace LibraryApp.BLL.Services
                     .SendAsync(
                         userEntity.Email,
                         changeEmailToken,
-                        EmailServiceAuthorizationConstants.ConfirmEmailReset
+                        AccountEmailServiceConstants.ConfirmEmailReset
                     );
 
                 return Result.CreateSuccess();
@@ -197,7 +213,7 @@ namespace LibraryApp.BLL.Services
                 await _emailService.SendAsync(
                     resetPasswordDto.Email,
                     passwordResetToken,
-                    EmailServiceAuthorizationConstants.ConfirmPasswordReset
+                    AccountEmailServiceConstants.ConfirmPasswordReset
                 );
 
                 return Result.CreateSuccess();

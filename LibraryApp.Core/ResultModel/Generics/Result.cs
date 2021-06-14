@@ -10,7 +10,7 @@ namespace LibraryApp.Core.ResultModel.Generics
     {
         private readonly List<string> _messagesList;
 
-        public Result(bool success, TData data = default, IEnumerable<string>? messages = null,
+        private Result(bool success, TData data = default!, IEnumerable<string>? messages = null,
             Exception? exception = null)
         {
             _messagesList = messages?.ToList() ?? new List<string>();

@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LibraryApp.BLL
+namespace LibraryApp.Core
 {
-    public class AuthOptions
+    public static class AuthOptions
     {
         public const string Issuer = "LibApiServer";
 
@@ -13,6 +13,7 @@ namespace LibraryApp.BLL
 
         public const int Lifetime = 60;
 
-        public static SymmetricSecurityKey SymmetricSecurityKey => new(Encoding.ASCII.GetBytes(Key));
+        public static SymmetricSecurityKey SymmetricSecurityKey =>
+            new(Encoding.ASCII.GetBytes(Key));
     }
 }
