@@ -43,8 +43,8 @@ namespace LibraryApp.BLL.Tests
         public static IEnumerable<object[]> TestData()
         {
             yield return new object[] {new RegisterDto("ihorployka2@gmail.com", "IhorPassword", 20)};
-            yield return new object[] {new RegisterDto("ihorployka2@gmail.com", "IhorPassword", 20)};
-            yield return new object[] {new RegisterDto("nazarkokhan@gmail.com", "IhorPassword", 20)};
+            yield return new object[] {new RegisterDto("abek1ksd3dn@gmail.com", "NotExist", 20)};
+            yield return new object[] {new RegisterDto("nazarkokhan@gmail.com", "NazarPassword", 20)};
         }
     }
 }

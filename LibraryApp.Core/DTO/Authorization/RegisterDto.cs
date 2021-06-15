@@ -2,6 +2,19 @@
 
 namespace LibraryApp.Core.DTO.Authorization
 {
+    public class RegistrationTokenDto
+    {
+        public RegistrationTokenDto(string email, string token)
+        {
+            Email = email;
+            Token = token;
+        }
+
+        public string Email { get; }
+        
+        public string Token { get; }
+    }
+    
     public class RegisterDto
     {
         public RegisterDto(string email, string password, int age)

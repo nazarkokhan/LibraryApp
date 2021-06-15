@@ -13,19 +13,13 @@
         public string NewEmail { get; }
     }
 
-    public class TokenPasswordDto
+    public class ResetEmailDto
     {
-        public TokenPasswordDto(string token, string newPassword, string email)
+        public ResetEmailDto(string newEmail)
         {
-            Token = token;
-            NewPassword = newPassword;
-            Email = email;
+            NewEmail = newEmail;
         }
 
-        public string Token { get; }
-
-        public string NewPassword { get; }
-
-        public string Email { get; }
+        public string NewEmail { get; }
     }
 }

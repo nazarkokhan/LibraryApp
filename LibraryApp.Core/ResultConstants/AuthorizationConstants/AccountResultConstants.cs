@@ -1,6 +1,6 @@
 ﻿namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
 {
-    public static class AuthServiceResultConstants
+    public static class AccountResultConstants
     {
         /// <summary>
         /// Represents message when user with the same email already exists in system.
@@ -20,8 +20,13 @@
         /// <summary>
         /// Represents message when user sent invalid code for password resetting.
         /// </summary>
+        public const string InvalidRegistrationToken = "IVALID_REGISTRATION_TOKEN";
+
+        /// <summary>
+        /// Represents message when user sent invalid code for password resetting.
+        /// </summary>
         public const string InvalidResetPasswordToken = "IVALID_RESET_PASSWORD_TOKEN";
-        
+
         /// <summary>
         /// Represents message when user sent invalid code for email resetting.
         /// </summary>

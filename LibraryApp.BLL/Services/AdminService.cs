@@ -61,7 +61,7 @@ namespace LibraryApp.BLL.Services
 
                 return userEntity is null
                     ? Result<User>.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     )
                     : Result<User>.CreateSuccess(userEntity);
@@ -111,7 +111,7 @@ namespace LibraryApp.BLL.Services
 
                 if (userEntity is null)
                     return Result.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 

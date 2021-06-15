@@ -7,8 +7,10 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAccountService
     {
-        Task<Result> RegisterAsync(RegisterDto register);
+        Task<Result> SendRegisterTokenAsync(RegisterDto register);
 
+        Task<Result> ConfirmRegistrationAsync(string token, string userId);
+        
         Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput);
 
         Result<UserFromTokenDto> GetProfile();

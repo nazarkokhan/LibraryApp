@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core;
 using LibraryApp.Core.DTO.Authorization;
@@ -14,6 +19,7 @@ using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.BLL.Services
@@ -31,29 +37,51 @@ namespace LibraryApp.BLL.Services
             _emailService = emailService;
         }
 
-        public async Task<Result> RegisterAsync(RegisterDto register)
+        public async Task<Result> SendRegisterTokenAsync(RegisterDto register)
         {
             try
             {
                 var user = new User {Email = register.Email, UserName = register.Email, Age = register.Age};
 
-                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var createResult = await _userManager.CreateAsync(user, register.Password);
+
+                if (!createResult.Succeeded)
+                    return Result.CreateFailed(AccountResultConstants.UserAlreadyExists);
+
+                var emailConfirmationToken = 
+                    HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
+
+                //emailConfirmationToken = emailConfirmationToken.Replace('+', '-');
 
                 await _emailService.SendAsync(
                     to: user.Email,
-                    body: $"Your confirmation token:\n {emailConfirmationToken}",
+                    body: $"<a class=\"link\" href=\"https://localhost:5001/api/account/register" +
+                          $"?token={emailConfirmationToken}" +
+                          $"&userId={user.Id}\">Confirm registration</a>\n",
                     subject: AccountEmailServiceConstants.ConfirmRegistration
                 );
 
-                var tokenIsValid = await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
+                return Result.CreateSuccess();
+            }
+            catch (Exception e)
+            {
+                return Result.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
+        }
 
-                if (user.EmailConfirmed)
-                {
-                    await _userManager.CreateAsync(user, register.Password);
-                }
+        public async Task<Result> ConfirmRegistrationAsync(string token, string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
 
-                await _userManager.CreateAsync(user, register.Password);
-                
+                //token = token.Replace('-', '+');
+
+                var tokenIsValid = await _userManager.ConfirmEmailAsync(user, token);
+
+                if (!tokenIsValid.Succeeded)
+                    return Result.CreateFailed(AccountResultConstants.InvalidRegistrationToken);
+
                 await _userManager.AddToRoleAsync(user, Roles.User);
 
                 await _emailService.SendAsync(
@@ -78,12 +106,12 @@ namespace LibraryApp.BLL.Services
 
                 if (user is null)
                     return Result<Token>.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 
                 if (!await _userManager.CheckPasswordAsync(user, userInput.Password))
-                    return Result<Token>.CreateFailed(AuthServiceResultConstants.InvalidUserNameOrPassword);
+                    return Result<Token>.CreateFailed(AccountResultConstants.InvalidUserNameOrPassword);
 
                 var timeNow = DateTime.Now;
 
@@ -144,7 +172,7 @@ namespace LibraryApp.BLL.Services
 
                 if (userEntity is null)
                     return Result.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 
@@ -177,7 +205,7 @@ namespace LibraryApp.BLL.Services
 
                 if (userEntity is null)
                     return Result.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 
@@ -185,7 +213,7 @@ namespace LibraryApp.BLL.Services
                     .ChangeEmailAsync(userEntity, tokenEmailDto.NewEmail, tokenEmailDto.Token);
 
                 return !changeEmail.Succeeded
-                    ? Result.CreateFailed(AuthServiceResultConstants.InvalidResetEmailToken)
+                    ? Result.CreateFailed(AccountResultConstants.InvalidResetEmailToken)
                     : Result.CreateSuccess();
             }
             catch (Exception e)
@@ -203,7 +231,7 @@ namespace LibraryApp.BLL.Services
 
                 if (userEntity is null)
                     return Result.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 
@@ -233,7 +261,7 @@ namespace LibraryApp.BLL.Services
 
                 if (userEntity is null)
                     return Result.CreateFailed(
-                        AuthServiceResultConstants.UserNotFound,
+                        AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     );
 
@@ -244,7 +272,7 @@ namespace LibraryApp.BLL.Services
                 );
 
                 return !resetPassword.Succeeded
-                    ? Result.CreateFailed(AuthServiceResultConstants.InvalidResetPasswordToken)
+                    ? Result.CreateFailed(AccountResultConstants.InvalidResetPasswordToken)
                     : Result.CreateSuccess();
             }
             catch (Exception e)
