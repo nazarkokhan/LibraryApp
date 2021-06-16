@@ -45,7 +45,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUsers([Range(0, int.MaxValue)] int id)
+        public async Task<IActionResult> DeleteUsers([Range(0, int.MaxValue)] int id) 
         {
             return (await _adminService.DeleteUserAsync(id)).ToActionResult();
         }

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,14 +34,14 @@ namespace LibraryApp.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LogInAsync(LogInUserDto userDto)
         {
-            return (await _accountService.GetAccessTokenAsync(userDto)).ToActionResult();
+            return (await _accountService.GetAccessTokenAsync(userDto, User.GetUserId())).ToActionResult();
         }
         
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("profile")]
-        public IActionResult GetProfile()
+        public async Task<IActionResult> GetProfile()
         {
-            return (_accountService.GetProfile()).ToActionResult();
+            return (await _accountService.GetProfile(User.GetUserId())).ToActionResult();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

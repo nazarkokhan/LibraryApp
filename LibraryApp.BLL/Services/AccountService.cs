@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
@@ -27,13 +26,13 @@ namespace LibraryApp.BLL.Services
     public class AccountService : IAccountService
     {
         private readonly IEmailService _emailService;
-        private readonly IHttpContextAccessor _http;
+
+        // private readonly IHttpContextAccessor _http;
         private readonly UserManager<User> _userManager;
 
-        public AccountService(UserManager<User> userManager, IHttpContextAccessor http, IEmailService emailService)
+        public AccountService(UserManager<User> userManager, IEmailService emailService)
         {
             _userManager = userManager;
-            _http = http;
             _emailService = emailService;
         }
 
@@ -48,16 +47,19 @@ namespace LibraryApp.BLL.Services
                 if (!createResult.Succeeded)
                     return Result.CreateFailed(AccountResultConstants.UserAlreadyExists);
 
-                var emailConfirmationToken = 
+                var emailConfirmationToken =
                     HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
 
-                //emailConfirmationToken = emailConfirmationToken.Replace('+', '-');
+                var pureLink =
+                    $"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}";
 
+                var htmlLink =
+                    $"<a class=\"link\" href=\"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}\">Confirm registration</a>\n";
+
+                var lnk = HttpUtility.HtmlEncode(htmlLink);
                 await _emailService.SendAsync(
                     to: user.Email,
-                    body: $"<a class=\"link\" href=\"https://localhost:5001/api/account/register" +
-                          $"?token={emailConfirmationToken}" +
-                          $"&userId={user.Id}\">Confirm registration</a>\n",
+                    body: pureLink,
                     subject: AccountEmailServiceConstants.ConfirmRegistration
                 );
 
@@ -74,8 +76,6 @@ namespace LibraryApp.BLL.Services
             try
             {
                 var user = await _userManager.FindByIdAsync(userId);
-
-                //token = token.Replace('-', '+');
 
                 var tokenIsValid = await _userManager.ConfirmEmailAsync(user, token);
 
@@ -139,36 +139,26 @@ namespace LibraryApp.BLL.Services
             }
         }
 
-        public Result<UserFromTokenDto> GetProfile()
+        public async Task<Result<ProfileDto>> GetProfile(int userId)
         {
             try
             {
-                if (_http.HttpContext is null)
-                    return Result<UserFromTokenDto>.CreateFailed(
-                        "HttpContext is NULL",
-                        new NotSupportedException()
-                    );
+                var userEntity = await _userManager.FindByIdAsync(userId.ToString());
 
-                var user = new UserFromTokenDto(
-                    int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!),
-                    _http.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value!,
-                    _http.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!
-                );
-
-                return Result<UserFromTokenDto>.CreateSuccess(user);
+                return Result<ProfileDto>.CreateSuccess(new ProfileDto(userEntity.Id, userEntity.Email));
             }
             catch (Exception e)
             {
-                return Result<UserFromTokenDto>.CreateFailed(CommonResultConstants.Unexpected, e);
+                return Result<ProfileDto>.CreateFailed(CommonResultConstants.Unexpected, e);
             }
         }
 
-        public async Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto)
+        public async Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto, int userId)
         {
             try
             {
                 var userEntity = await _userManager
-                    .FindByEmailAsync(_http.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
+                    .FindByIdAsync(userId.ToString());
 
                 if (userEntity is null)
                     return Result.CreateFailed(
@@ -196,12 +186,12 @@ namespace LibraryApp.BLL.Services
             }
         }
 
-        public async Task<Result> ResetEmailAsync(TokenEmailDto tokenEmailDto)
+        public async Task<Result> ResetEmailAsync(TokenEmailDto tokenEmailDto, int userId)
         {
             try
             {
                 var userEntity = await _userManager
-                    .FindByEmailAsync(_http.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
+                    .FindByIdAsync(userId.ToString());
 
                 if (userEntity is null)
                     return Result.CreateFailed(

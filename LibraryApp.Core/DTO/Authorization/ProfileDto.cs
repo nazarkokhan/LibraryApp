@@ -1,18 +1,15 @@
 ﻿namespace LibraryApp.Core.DTO.Authorization
 {
-    public class UserFromTokenDto
+    public class ProfileDto
     {
-        public UserFromTokenDto(int id, string email, string role)
+        public ProfileDto(int id, string email)
         {
             Id = id;
             Email = email;
-            Role = role;
         }
 
         public int Id { get; }
 
         public string Email { get; }
-
-        public string Role { get; }
     }
 }
