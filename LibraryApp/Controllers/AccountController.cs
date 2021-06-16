@@ -61,7 +61,7 @@ namespace LibraryApp.Controllers
         [HttpGet("reset-password/email-token")]
         public async Task<IActionResult> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto)
         {
-            return (await _accountService.SendPasswordResetTokenAsync(resetPasswordDto)).ToActionResult();
+            return (await _accountService.SendPasswordResetTokenAsync(resetPasswordDto, User.GetUserId())).ToActionResult();
         }
 
         [HttpPut("reset-password")]
