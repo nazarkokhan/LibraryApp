@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.IdentityModel.Tokens;
+using Role = LibraryApp.Core.ResultConstants.AuthorizationConstants.Role;
 
 namespace LibraryApp.BLL.Services
 {
@@ -27,7 +28,6 @@ namespace LibraryApp.BLL.Services
     {
         private readonly IEmailService _emailService;
 
-        // private readonly IHttpContextAccessor _http;
         private readonly UserManager<User> _userManager;
 
         public AccountService(UserManager<User> userManager, IEmailService emailService)
@@ -54,7 +54,8 @@ namespace LibraryApp.BLL.Services
                     $"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}";
 
                 var htmlLink =
-                    $"<a class=\"link\" href=\"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}\">Confirm registration</a>\n";
+                    $"<a class=\"link\" href=\"https://localhost:5001/api/account/register?" +
+                    $"token={emailConfirmationToken}&userId={user.Id}\">Confirm registration</a>\n";
 
                 var lnk = HttpUtility.HtmlEncode(htmlLink);
                 await _emailService.SendAsync(
@@ -82,7 +83,7 @@ namespace LibraryApp.BLL.Services
                 if (!tokenIsValid.Succeeded)
                     return Result.CreateFailed(AccountResultConstants.InvalidRegistrationToken);
 
-                await _userManager.AddToRoleAsync(user, Roles.User);
+                await _userManager.AddToRoleAsync(user, Role.User.ToString());
 
                 await _emailService.SendAsync(
                     to: user.Email,
@@ -166,15 +167,22 @@ namespace LibraryApp.BLL.Services
                         new NullReferenceException()
                     );
 
-                var changeEmailToken = await _userManager
-                    .GenerateChangeEmailTokenAsync(userEntity, resetEmailDto.NewEmail);
+                var changeEmailToken = HttpUtility.UrlEncode(await _userManager
+                    .GenerateChangeEmailTokenAsync(
+                        userEntity,
+                        resetEmailDto.NewEmail
+                    )
+                );
 
-                // var htmlToken = $"https://localhost:5001/api/account/reset/email?newEmail={resetEmailDto.NewEmail}";
+                var pureLink =
+                    $"https://localhost:5001/api/account/reset-email" +
+                    $"?token={changeEmailToken}" +
+                    $"&newEmail={resetEmailDto.NewEmail}";
 
                 await _emailService
                     .SendAsync(
                         userEntity.Email,
-                        changeEmailToken,
+                        pureLink,
                         AccountEmailServiceConstants.ConfirmEmailReset
                     );
 
@@ -186,7 +194,7 @@ namespace LibraryApp.BLL.Services
             }
         }
 
-        public async Task<Result> ResetEmailAsync(TokenEmailDto tokenEmailDto, int userId)
+        public async Task<Result> ResetEmailAsync(string token, string newEmail, int userId)
         {
             try
             {
@@ -200,11 +208,14 @@ namespace LibraryApp.BLL.Services
                     );
 
                 var changeEmail = await _userManager
-                    .ChangeEmailAsync(userEntity, tokenEmailDto.NewEmail, tokenEmailDto.Token);
+                    .ChangeEmailAsync(userEntity, newEmail, token);
 
-                return !changeEmail.Succeeded
-                    ? Result.CreateFailed(AccountResultConstants.InvalidResetEmailToken)
-                    : Result.CreateSuccess();
+                if (!changeEmail.Succeeded)
+                    Result.CreateFailed(AccountResultConstants.InvalidResetEmailToken);
+
+                userEntity.UserName = newEmail;
+
+                return Result.CreateSuccess();
             }
             catch (Exception e)
             {
@@ -257,7 +268,7 @@ namespace LibraryApp.BLL.Services
 
                 var resetPassword = await _userManager.ResetPasswordAsync(
                     userEntity,
-                    $"{tokenPasswordDto.Token}",
+                    $"{tokenPasswordDto}",
                     tokenPasswordDto.NewPassword
                 );
 

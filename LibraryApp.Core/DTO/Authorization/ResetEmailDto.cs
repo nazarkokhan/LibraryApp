@@ -1,25 +1,19 @@
-﻿namespace LibraryApp.Core.DTO.Authorization
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LibraryApp.Core.DTO.Authorization
 {
-    public class TokenEmailDto
-    {
-        public TokenEmailDto(string token, string newEmail)
-        {
-            Token = token;
-            NewEmail = newEmail;
-        }
-
-        public string Token { get; }
-
-        public string NewEmail { get; }
-    }
-
     public class ResetEmailDto
     {
-        public ResetEmailDto(string newEmail)
+        public ResetEmailDto(string newEmail, string confirmNewEmail)
         {
             NewEmail = newEmail;
+            ConfirmNewEmail = confirmNewEmail;
         }
 
+        [DataType(DataType.EmailAddress)]
         public string NewEmail { get; }
+
+        [Compare("NewEmail", ErrorMessage = "Emails have to be equal")]
+        public string ConfirmNewEmail { get; }
     }
 }

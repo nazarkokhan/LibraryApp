@@ -2,7 +2,7 @@
 using LibraryApp.Core.ResultModel.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LibraryApp
+namespace LibraryApp.Extensions
 {
     public static class ActionResultExtensions
     {

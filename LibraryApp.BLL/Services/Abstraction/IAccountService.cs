@@ -11,16 +11,16 @@ namespace LibraryApp.BLL.Services.Abstraction
 
         Task<Result> ConfirmRegistrationAsync(string token, string userId);
         
-        Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput, int userId);
+        Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput);
 
         Task<Result<ProfileDto>> GetProfile(int userId);
 
-        Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto);
+        Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto, int userId);
 
-        Task<Result> ResetEmailAsync(TokenEmailDto tokenEmailDto);
+        Task<Result> ResetEmailAsync(string token, string newEmail, int userId);
 
-        Task<Result> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto, int userId);
+        Task<Result> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);
 
-        Task<Result> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto, int userId);
+        Task<Result> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto);
     }
 }

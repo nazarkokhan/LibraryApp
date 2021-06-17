@@ -1,19 +1,27 @@
-﻿namespace LibraryApp.Core.DTO.Authorization
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LibraryApp.Core.DTO.Authorization
 {
     public class TokenPasswordDto
     {
-        public TokenPasswordDto(string token, string newPassword, string email)
+        public TokenPasswordDto(string newPassword, string email, string confirmNewPassword, string token)
         {
-            Token = token;
-            NewPassword = newPassword;
             Email = email;
+            NewPassword = newPassword;
+            ConfirmNewPassword = confirmNewPassword;
+            Token = token;
         }
 
-        public string Token { get; }
+        [DataType(DataType.EmailAddress)] 
+        public string Email { get; }
 
+        [DataType(DataType.Password)] 
         public string NewPassword { get; }
 
-        public string Email { get; }
+        [Compare("NewPassword", ErrorMessage = "Passwords have to be equal")]
+        public string ConfirmNewPassword { get; }
+
+        public string Token { get; }
     }
 
     public class ResetPasswordDto
@@ -23,6 +31,6 @@
             Email = email;
         }
 
-        public string Email { get; }
+        [DataType(DataType.EmailAddress)] public string Email { get; }
     }
 }

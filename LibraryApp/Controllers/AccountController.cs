@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -30,38 +31,38 @@ namespace LibraryApp.Controllers
         {
             return (await _accountService.ConfirmRegistrationAsync(token, userId)).ToActionResult();
         }
-
+        
         [HttpPost("login")]
         public async Task<IActionResult> LogInAsync(LogInUserDto userDto)
         {
-            return (await _accountService.GetAccessTokenAsync(userDto, User.GetUserId())).ToActionResult();
+            return (await _accountService.GetAccessTokenAsync(userDto)).ToActionResult();
         }
         
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BearerAuthorize(Role.Admin | Role.User)]
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
             return (await _accountService.GetProfile(User.GetUserId())).ToActionResult();
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("reset-email/email-token")]
+        [BearerAuthorize(Role.Admin | Role.User)]
+        [HttpPut("reset-email/email-token")]
         public async Task<IActionResult> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto)
         {
-            return (await _accountService.SendEmailResetTokenAsync(resetEmailDto)).ToActionResult();
+            return (await _accountService.SendEmailResetTokenAsync(resetEmailDto, User.GetUserId())).ToActionResult();
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPut("reset-email")]
-        public async Task<IActionResult> ResetEmailAsync(TokenEmailDto tokenEmailDto)
+        [BearerAuthorize(Role.Admin | Role.User)]
+        [HttpGet("reset-email")]
+        public async Task<IActionResult> ResetEmailAsync(string token, string newEmail)
         {
-            return (await _accountService.ResetEmailAsync(tokenEmailDto)).ToActionResult();
+            return (await _accountService.ResetEmailAsync(token, newEmail, User.GetUserId())).ToActionResult();
         }
 
-        [HttpGet("reset-password/email-token")]
+        [HttpPut("reset-password/email-token")]
         public async Task<IActionResult> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto)
         {
-            return (await _accountService.SendPasswordResetTokenAsync(resetPasswordDto, User.GetUserId())).ToActionResult();
+            return (await _accountService.SendPasswordResetTokenAsync(resetPasswordDto)).ToActionResult();
         }
 
         [HttpPut("reset-password")]

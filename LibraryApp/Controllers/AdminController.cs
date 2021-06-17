@@ -5,13 +5,15 @@ using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.DAL.Entities;
+using LibraryApp.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Role = LibraryApp.Core.ResultConstants.AuthorizationConstants.Role;
 
 namespace LibraryApp.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = Roles.Admin)]
+    [BearerAuthorize(Role.Admin)]
     [ApiController]
     [Route("api/[controller]/users")]
     public class AdminController : ControllerBase

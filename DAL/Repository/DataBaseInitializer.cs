@@ -9,6 +9,7 @@ using LibraryApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Role = LibraryApp.Core.ResultConstants.AuthorizationConstants.Role;
 
 namespace LibraryApp.DAL.Repository
 {
@@ -16,7 +17,7 @@ namespace LibraryApp.DAL.Repository
     {
         private readonly LibContext _db;
 
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<Entities.Role> _roleManager;
 
         private readonly UserManager<User> _userManager;
         
@@ -24,13 +25,13 @@ namespace LibraryApp.DAL.Repository
 
         private readonly List<Book> _books;
 
-        private readonly List<Role> _roles;
+        private readonly List<Entities.Role> _roles;
 
         private readonly List<RegisterDto> _users;
         
         private readonly IHostEnvironment _hostEnvironment;
 
-        public DataBaseInitializer(LibContext db, RoleManager<Role> roleManager, UserManager<User> userManager, IHostEnvironment hostEnvironment)
+        public DataBaseInitializer(LibContext db, RoleManager<Entities.Role> roleManager, UserManager<User> userManager, IHostEnvironment hostEnvironment)
         {
             _db = db;
             _roleManager = roleManager;
@@ -51,10 +52,10 @@ namespace LibraryApp.DAL.Repository
                 new() {Name = "Tri Porosenka"}
             };
 
-            _roles ??= new List<Role>
+            _roles ??= new List<Entities.Role>
             {
-                new() {Name = Roles.Admin, RoleDescription = "Has a admin access"},
-                new() {Name = Roles.User, RoleDescription = "Role for all registered users"}
+                new() {Name = Role.Admin.ToString(), RoleDescription = "Has a admin access"},
+                new() {Name = Role.User.ToString(), RoleDescription = "Role for all registered users"}
             };
 
             _users ??= new List<RegisterDto>
@@ -144,11 +145,13 @@ namespace LibraryApp.DAL.Repository
 
                     await _userManager.CreateAsync(user, u.Password);
 
+                    user.EmailConfirmed = true;
+                    
                     if (user.Id != 1)
-                        await _userManager.AddToRoleAsync(user, Roles.User);
+                        await _userManager.AddToRoleAsync(user, Role.User.ToString());
 
                     else
-                        await _userManager.AddToRoleAsync(user, Roles.Admin);
+                        await _userManager.AddToRoleAsync(user, Role.Admin.ToString());
                 });
         }
     }
