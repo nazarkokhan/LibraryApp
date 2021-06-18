@@ -7,6 +7,7 @@ using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Repository.Abstraction;
+using LibraryApp.Extensions;
 using LibraryApp.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,24 +34,8 @@ namespace LibraryApp
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = AuthOptions.Issuer,
-
-                        ValidateAudience = true,
-                        ValidAudience = AuthOptions.Audience,
-
-                        ValidateLifetime = true,
-
-                        IssuerSigningKey = AuthOptions.SymmetricSecurityKey,
-                        ValidateIssuerSigningKey = true
-                    };
-                });
+                .AddAuthentication()
+                .AddJwtBearer(options => options.JwtBearerOptions());
 
             services
                 .AddIdentity<User, Role>(options => options.ConfigurePassword())
@@ -61,7 +46,8 @@ namespace LibraryApp
             services
                 .AddDbContext<LibContext>(options => options
                     .UseSqlServer(Configuration.GetConnectionString($"{nameof(LibContext)}"))
-                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())));
+                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole()))
+                );
 
             services
                 .AddHttpContextAccessor()

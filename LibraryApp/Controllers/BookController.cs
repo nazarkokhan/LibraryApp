@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers
 {
-    [BearerAuthorize(Role.Admin | Role.User)]
+    [BearerAuthorize(Role.User | Role.Admin)]
     [ApiController]
     [Route("api/[controller]")]
     public class BookController : ControllerBase

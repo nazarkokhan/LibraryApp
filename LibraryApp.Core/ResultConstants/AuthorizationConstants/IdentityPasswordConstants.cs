@@ -5,6 +5,6 @@ namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
         /// <summary>
         /// Represents required lenght of password.
         /// </summary>
-        public const int RequiredLength = 8;
+        public const int RequiredLength = 6;
     }
 }

@@ -146,7 +146,13 @@ namespace LibraryApp.BLL.Services
             {
                 var userEntity = await _userManager.FindByIdAsync(userId.ToString());
 
-                return Result<ProfileDto>.CreateSuccess(new ProfileDto(userEntity.Id, userEntity.Email));
+                return Result<ProfileDto>.CreateSuccess(
+                    new ProfileDto
+                    (
+                        userEntity.Id,
+                        userEntity.Email
+                    )
+                );
             }
             catch (Exception e)
             {

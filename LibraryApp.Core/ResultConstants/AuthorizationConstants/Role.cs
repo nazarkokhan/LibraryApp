@@ -6,12 +6,12 @@ namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
     public enum Role
     {
         /// <summary>
-        /// Represents Admin role.
+        /// Represents User role.
         /// </summary>
         User = 1,
         
         /// <summary>
-        /// Represents User role.
+        /// Represents Admin role.
         /// </summary>
         Admin = 2
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LibraryApp.BLL.Services;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
@@ -16,42 +17,48 @@ namespace LibraryApp.BLL.Tests
     public class AccountServiceTests
     {
         private readonly IAccountService _accountService;
-        private readonly Mock<UserManager<User>> _userManager;
+        private readonly Mock<UserManager<User>> _userManagerMock;
         private readonly Mock<IEmailService> _emailService;
-        
+        private readonly RegisterDto _registerDto = new RegisterDto("ihorployka2@gmail.com", "ihorAccess", 30);
         public AccountServiceTests()
         {
             var store = new Mock<IUserStore<User>>();
-            var mgr = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
             
-            _userManager = new Mock<UserManager<User>>();
+            _userManagerMock = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
             _emailService = new Mock<IEmailService>();
-            _accountService = new AccountService(mgr.Object, _emailService.Object);
+            _accountService = new AccountService(_userManagerMock.Object, _emailService.Object);
         }
 
-        [Fact]
-        public void GetProfile_allIds_successReturned()
+        [Theory]
+        [InlineData(1, "admin@gmail.com")]
+        [InlineData(2, "admin1@gmail.com")]
+        [InlineData(3, "admin2@gmail.com")]
+        public async Task GetProfile_IdFromClaims_successReturned(int id, string email)
         {
-            // var expected = _accountService.Setup(service => service.GetProfile()).Returns(Result<UserFromTokenDto>
-            //         .CreateSuccess(new UserFromTokenDto(1, "admin@gmail.com", Roles.Admin)));
+            var expected = new ProfileDto(id, email);
+
+            _userManagerMock
+                .Setup(manager => manager.FindByIdAsync(id.ToString()))
+                .Returns(Task.FromResult(new User
+                {
+                    Id = id,
+                    Email = email
+                }));
             
-            var actual = _accountService.GetProfile(1);
             
-            //expected.Equals(actual);
-            // Assert.Equal(expected, actual);
+            var actual = await _accountService.GetProfile(id);
+            
+            Assert.Equal(actual.Data.Id, expected.Id);
+            Assert.Equal(actual.Data.Email, expected.Email);
         }
 
-        // [Theory]
-        // [InlineData(0)]
-        // public void 
-
-        // public static IEnumerable<object[]> TestData()
-        // {
-        //     yield return new object[] {new RegisterDto("ihorployka2@gmail.com", "IhorPassword", 20)};
-        //     yield return new object[] {new RegisterDto("abek1ksd3dn@gmail.com", "NotExist", 20)};
-        //     yield return new object[] {new RegisterDto("nazarkokhan@gmail.com", "NazarPassword", 20)};
-        // }
+        [Theory]
+        [ClassData()]
+        public async Task SendRegisterToken_RegisterDto_successReturned(RegisterDto userDto)
+        {
+            var x = await _accountService.SendRegisterTokenAsync() 
+        }
+        
     }
-    
     
 }
