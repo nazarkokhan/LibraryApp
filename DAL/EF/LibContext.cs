@@ -15,5 +15,7 @@ namespace LibraryApp.DAL.EF
         public DbSet<Book> Books { get; set; }
 
         public DbSet<AuthorBook> AuthorBooks { get; set; }
+
+        public override DbSet<User> Users { get; set; }
     }
 }

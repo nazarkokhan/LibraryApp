@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LibraryApp.Core.DTO;
 using LibraryApp.Core.ResultModel.Abstraction.Generics;
 
 namespace LibraryApp.Core.ResultModel.Generics

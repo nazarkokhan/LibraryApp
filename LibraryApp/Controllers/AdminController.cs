@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
-using LibraryApp.Core.ResultConstants.AuthorizationConstants;
-using LibraryApp.DAL.Entities;
 using LibraryApp.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Role = LibraryApp.Core.ResultConstants.AuthorizationConstants.Role;
 

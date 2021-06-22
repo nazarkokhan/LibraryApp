@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using LibraryApp;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 
 namespace LibraryApp.Core.DTO.Authorization

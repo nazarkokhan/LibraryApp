@@ -2,9 +2,7 @@
 using System.Threading.Tasks;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO;
-using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,15 +1,11 @@
-using LibraryApp.BLL;
 using LibraryApp.BLL.Services;
 using LibraryApp.BLL.Services.Abstraction;
-using LibraryApp.Core;
-using LibraryApp.Core.Extensions;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Repository.Abstraction;
 using LibraryApp.Extensions;
 using LibraryApp.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp
 {
@@ -57,6 +52,7 @@ namespace LibraryApp
                 .AddTransient<IBookService, BookService>()
                 .AddScoped<IAuthorRepository, AuthorRepository>()
                 .AddScoped<IBookRepository, BookRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IAdminService, AdminService>()
                 .AddSingleton<IEmailService, EmailService>()

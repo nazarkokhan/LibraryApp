@@ -7,7 +7,7 @@ namespace LibraryApp.BLL.Services.Abstraction
 {
     public interface IAccountService
     {
-        Task<Result> SendRegisterTokenAsync(RegisterDto register);
+        Task<Result> CreateUserAndSendEmailTokenAsync(RegisterDto register);
 
         Task<Result> ConfirmRegistrationAsync(string token, string userId);
         

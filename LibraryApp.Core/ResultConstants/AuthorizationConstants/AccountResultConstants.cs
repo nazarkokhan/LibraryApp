@@ -5,6 +5,11 @@
         /// <summary>
         /// Represents message when user with the same email already exists in system.
         /// </summary>
+        public const string ErrorCreatingUser = "ERROR_CREATING_USER";
+        
+        /// <summary>
+        /// Represents message when user with the same email already exists in system.
+        /// </summary>
         public const string UserAlreadyExists = "USER_EXISTS";
 
         /// <summary>

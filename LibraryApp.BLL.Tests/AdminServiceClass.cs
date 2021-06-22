@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace LibraryApp.BLL.Tests
+﻿namespace LibraryApp.BLL.Tests
 {
     // public class AdminServiceTests
     // {

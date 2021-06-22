@@ -1,9 +1,5 @@
-using System;
 using System.Threading.Tasks;
-using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.DAL.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

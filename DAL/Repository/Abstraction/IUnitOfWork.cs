@@ -7,6 +7,8 @@ namespace LibraryApp.DAL.Repository.Abstraction
         IAuthorRepository Authors { get; }
 
         IBookRepository Books { get; }
+        
+        IUserRepository Users { get; }
 
         Task SaveAsync();
     }

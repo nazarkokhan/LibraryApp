@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Mail;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
 using LibraryApp.BLL.Services.Abstraction;
@@ -16,9 +13,9 @@ using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
-using Microsoft.AspNetCore.Http;
+using LibraryApp.DAL.Repository;
+using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.IdentityModel.Tokens;
 using Role = LibraryApp.Core.ResultConstants.AuthorizationConstants.Role;
 
@@ -30,22 +27,33 @@ namespace LibraryApp.BLL.Services
 
         private readonly UserManager<User> _userManager;
 
-        public AccountService(UserManager<User> userManager, IEmailService emailService)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AccountService(UserManager<User> userManager, IEmailService emailService, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result> SendRegisterTokenAsync(RegisterDto register)
+        public async Task<Result> CreateUserAndSendEmailTokenAsync(RegisterDto register)
         {
             try
             {
-                var user = new User {Email = register.Email, UserName = register.Email, Age = register.Age};
+                var user = new User
+                {
+                    Email = register.Email,
+                    UserName = register.Email, 
+                    Age = register.Age
+                };
+
+                if ((await _unitOfWork.Users.UserExistsAsync(register.Email)).Data)
+                    return Result.CreateFailed(AccountResultConstants.UserAlreadyExists);
 
                 var createResult = await _userManager.CreateAsync(user, register.Password);
 
                 if (!createResult.Succeeded)
-                    return Result.CreateFailed(AccountResultConstants.UserAlreadyExists);
+                    return Result.CreateFailed(AccountResultConstants.ErrorCreatingUser);
 
                 var emailConfirmationToken =
                     HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
@@ -54,10 +62,9 @@ namespace LibraryApp.BLL.Services
                     $"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}";
 
                 var htmlLink =
-                    $"<a class=\"link\" href=\"https://localhost:5001/api/account/register?" +
+                    "<a class=\"link\" href=\"https://localhost:5001/api/account/register?" +
                     $"token={emailConfirmationToken}&userId={user.Id}\">Confirm registration</a>\n";
 
-                var lnk = HttpUtility.HtmlEncode(htmlLink);
                 await _emailService.SendAsync(
                     to: user.Email,
                     body: pureLink,
@@ -76,17 +83,17 @@ namespace LibraryApp.BLL.Services
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(userId);
+                var userEntity = await _userManager.FindByIdAsync(userId);
 
-                var tokenIsValid = await _userManager.ConfirmEmailAsync(user, token);
+                var tokenIsValid = await _userManager.ConfirmEmailAsync(userEntity, token);
 
                 if (!tokenIsValid.Succeeded)
                     return Result.CreateFailed(AccountResultConstants.InvalidRegistrationToken);
 
-                await _userManager.AddToRoleAsync(user, Role.User.ToString());
+                await _userManager.AddToRoleAsync(userEntity, Role.User.ToString());
 
                 await _emailService.SendAsync(
-                    to: user.Email,
+                    to: userEntity.Email,
                     body: "You have successfully created your account in library!",
                     subject: AccountEmailServiceConstants.RegistrationConfirmed
                 );

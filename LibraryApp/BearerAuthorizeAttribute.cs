@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using LibraryApp.Core.ResultConstants.AuthorizationConstants;
+﻿using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 
