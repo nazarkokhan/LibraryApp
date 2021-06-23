@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using LibraryApp.Core.DTO;
 using LibraryApp.Core.ResultConstants;
-using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Repository.Abstraction;

@@ -13,7 +13,6 @@ using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
-using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -40,33 +39,33 @@ namespace LibraryApp.BLL.Services
         {
             try
             {
-                var user = new User
+                var userEntity = new User
                 {
                     Email = register.Email,
-                    UserName = register.Email, 
+                    UserName = register.Email,
                     Age = register.Age
                 };
 
                 if ((await _unitOfWork.Users.UserExistsAsync(register.Email)).Data)
                     return Result.CreateFailed(AccountResultConstants.UserAlreadyExists);
 
-                var createResult = await _userManager.CreateAsync(user, register.Password);
+                var createResult = await _userManager.CreateAsync(userEntity, register.Password);
 
                 if (!createResult.Succeeded)
                     return Result.CreateFailed(AccountResultConstants.ErrorCreatingUser);
 
                 var emailConfirmationToken =
-                    HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
+                    HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(userEntity));
 
                 var pureLink =
-                    $"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={user.Id}";
+                    $"https://localhost:5001/api/account/register?token={emailConfirmationToken}&userId={userEntity.Id}";
 
-                var htmlLink =
-                    "<a class=\"link\" href=\"https://localhost:5001/api/account/register?" +
-                    $"token={emailConfirmationToken}&userId={user.Id}\">Confirm registration</a>\n";
+                // var htmlLink =
+                //     "<a class=\"link\" href=\"https://localhost:5001/api/account/register?" +
+                //     $"token={emailConfirmationToken}&userId={userEntity.Id}\">Confirm registration</a>\n";
 
                 await _emailService.SendAsync(
-                    to: user.Email,
+                    to: userEntity.Email,
                     body: pureLink,
                     subject: AccountEmailServiceConstants.ConfirmRegistration
                 );
@@ -124,8 +123,8 @@ namespace LibraryApp.BLL.Services
                 var timeNow = DateTime.Now;
 
                 var jwt = new JwtSecurityToken(
-                    AuthOptions.Issuer,
-                    AuthOptions.Audience,
+                    issuer: AuthOptions.Issuer,
+                    audience: AuthOptions.Audience,
                     notBefore: timeNow,
                     claims: new List<Claim>
                     {
@@ -135,7 +134,8 @@ namespace LibraryApp.BLL.Services
                     },
                     expires: timeNow.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
                     signingCredentials: new SigningCredentials(AuthOptions.SymmetricSecurityKey,
-                        SecurityAlgorithms.HmacSha256));
+                        SecurityAlgorithms.HmacSha256)
+                );
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
@@ -188,7 +188,7 @@ namespace LibraryApp.BLL.Services
                 );
 
                 var pureLink =
-                    $"https://localhost:5001/api/account/reset-email" +
+                    "https://localhost:5001/api/account/reset-email" +
                     $"?token={changeEmailToken}" +
                     $"&newEmail={resetEmailDto.NewEmail}";
 
