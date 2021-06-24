@@ -4,7 +4,7 @@ namespace LibraryApp.Core.DTO.Authorization
 {
     public class TokenPasswordDto
     {
-        public TokenPasswordDto(string newPassword, string email, string confirmNewPassword, string token)
+        public TokenPasswordDto(string email, string newPassword, string confirmNewPassword, string token)
         {
             Email = email;
             NewPassword = newPassword;

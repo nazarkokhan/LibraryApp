@@ -11,6 +11,7 @@ using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
+using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,51 +21,32 @@ namespace LibraryApp.BLL.Services
     {
         private readonly UserManager<User> _userManager;
 
-        public AdminService(UserManager<User> userManager)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AdminService(UserManager<User> userManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page = 1, int items = 5)
+        public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items)
         {
-            try
-            {
-                var totalCount = await _userManager.Users.CountAsync();
-
-                var userEntities = _userManager.Users
-                    .OrderBy(a => a.Id)
-                    .TakePage(page, items);
-
-                if (!string.IsNullOrWhiteSpace(search))
-                    userEntities = userEntities
-                        .Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
-
-                return Result<Pager<User>>.CreateSuccess(
-                    new Pager<User>(
-                        await userEntities.ToListAsync(),
-                        totalCount
-                    )
-                );
-            }
-            catch (Exception e)
-            {
-                return Result<Pager<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
+            return await _unitOfWork.Users.GetUsersPageAsync(search, page, items);
         }
 
         public async Task<Result<User>> GetUserAsync([Range(0, int.MaxValue)] int id)
         {
             try
             {
-                var userEntity = await _userManager.Users
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                var userEntity = await _unitOfWork.Users
+                    .FindUserAsync(id);
 
-                return userEntity is null
+                return userEntity?.Data is null
                     ? Result<User>.CreateFailed(
                         AccountResultConstants.UserNotFound,
                         new NullReferenceException()
                     )
-                    : Result<User>.CreateSuccess(userEntity);
+                    : Result<User>.CreateSuccess(userEntity.Data);
             }
             catch (Exception e)
             {

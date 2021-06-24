@@ -224,7 +224,7 @@ namespace LibraryApp.BLL.Services
                     .ChangeEmailAsync(userEntity, newEmail, token);
 
                 if (!changeEmail.Succeeded)
-                    Result.CreateFailed(AccountResultConstants.InvalidResetEmailToken);
+                    return Result.CreateFailed(AccountResultConstants.InvalidResetEmailToken);
 
                 userEntity.UserName = newEmail;
 
