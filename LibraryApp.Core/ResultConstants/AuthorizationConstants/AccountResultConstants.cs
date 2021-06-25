@@ -8,6 +8,16 @@
         public const string ErrorCreatingUser = "ERROR_CREATING_USER";
         
         /// <summary>
+        /// Represents message when something goes wrong removing users password.
+        /// </summary>
+        public const string ErrorRemovingPassword = "ERROR_REMOVING_PASSWORD";
+        
+        /// <summary>
+        /// Represents message when something goes wrong adding password to user.
+        /// </summary>
+        public const string ErrorAddingPassword = "ERROR_ADDING_PASSWORD";
+        
+        /// <summary>
         /// Represents message when user with the same email already exists in system.
         /// </summary>
         public const string UserAlreadyExists = "USER_EXISTS";

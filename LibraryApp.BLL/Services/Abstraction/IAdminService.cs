@@ -14,7 +14,7 @@ namespace LibraryApp.BLL.Services.Abstraction
 
         Task<Result<User>> GetUserAsync([Range(0, int.MaxValue)] int id);
 
-        Task<Result<User>> EditUserAsync(EditUserDto userDto);
+        Task<Result<User>> EditUserAsync(EditUserDto editUserDto);
 
         Task<Result> DeleteUserAsync([Range(0, int.MaxValue)] int id);
     }

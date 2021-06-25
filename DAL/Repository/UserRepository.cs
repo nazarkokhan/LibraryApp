@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.Extensions;
 using LibraryApp.Core.ResultConstants;
+using LibraryApp.Core.ResultConstants.AuthorizationConstants;
+using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
@@ -23,26 +23,14 @@ namespace LibraryApp.DAL.Repository
         {
             _db = context;
         }
-
-        public async Task<Result<bool>> UserExistsAsync(string email)
-        {
-            try
-            {
-                return Result<bool>.CreateSuccess(await _db.Users.AnyAsync(u => u.Email == email));
-            }
-            catch (Exception e)
-            {
-                return Result<bool>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
-        }
-
+        
         public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items)
         {
             try
             {
                 var totalCount = await _db.Users
                     .CountAsync();
-                
+
                 var userEntities = _db.Users
                     .OrderBy(a => a.Id)
                     .TakePage(page, items);
@@ -63,15 +51,39 @@ namespace LibraryApp.DAL.Repository
                 return Result<Pager<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
             }
         }
+        
+        public async Task<Result<User>> GetUserAsync(int id)
+        {
+            try
+            {
+                var userEntity = await _db.Users
+                    .FindAsync(id);
+
+                return userEntity is null
+                    ? Result<User>.CreateFailed(
+                        AccountResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    )
+                    : Result<User>.CreateSuccess(userEntity);
+            }
+            catch (Exception e)
+            {
+                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
+        }
+
         public async Task<Result<User>> EditUserAsync(EditUserDto userDto)
         {
             try
             {
                 var userEntity = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Email == userDto.CurrentEmail);
+                    .FirstOrDefaultAsync(u => u.Id == int.Parse(userDto.Id));
 
                 if (userEntity is null)
-                    return Result<User>.CreateFailed("User does`nt exist", new NullReferenceException());
+                    return Result<User>.CreateFailed(
+                        AccountResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
                 userEntity.Email = userDto.NewEmail;
 
@@ -79,14 +91,9 @@ namespace LibraryApp.DAL.Repository
 
                 userEntity.Age = userDto.NewAge;
 
-                // await _userManager.RemovePasswordAsync(userEntity);
-
-                // var addPass = await _userManager.AddPasswordAsync(userEntity, userDto.NewPassword);
-
-                // return !addPass.Succeeded
-                //     ? Result<User>.CreateFailed("Error adding new password")
-                //     : Result<User>.CreateSuccess(userEntity);
-                return null;
+                await _db.SaveChangesAsync();
+                    
+                return Result<User>.CreateSuccess(userEntity);
             }
             catch (Exception e)
             {
@@ -94,37 +101,42 @@ namespace LibraryApp.DAL.Repository
             }
         }
 
-        public async Task<Result<List<User>>> TakeUsersPageAsync(string? search, int page, int items)
+        public async Task<Result> DeleteUserAsync(int id)
         {
             try
             {
-                var userEntities = _db.Users
-                    .OrderBy(a => a.Id)
-                    .TakePage(page, items);
+                var userEntity = await _db.Users
+                    .FirstOrDefaultAsync(u => u.Id == id);
 
-                if (!string.IsNullOrWhiteSpace(search))
-                    userEntities = userEntities
-                        .Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
+                if (userEntity is null)
+                    return Result.CreateFailed(
+                        AccountResultConstants.UserNotFound,
+                        new NullReferenceException()
+                    );
 
-                return Result<List<User>>.CreateSuccess(
-                    await userEntities.ToListAsync()
+                _db.Users.Remove(userEntity);
+
+                await _db.SaveChangesAsync();
+
+                return Result.CreateSuccess();
+            }
+            catch (Exception e)
+            {
+                return Result.CreateFailed(CommonResultConstants.Unexpected, e);
+            }
+        }
+        
+        public async Task<Result<bool>> UserExistsAsync(string email)
+        {
+            try
+            {
+                return Result<bool>.CreateSuccess(
+                    await _db.Users.AnyAsync(u => u.Email == email)
                 );
             }
             catch (Exception e)
             {
-                return Result<List<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
-        }
-        
-        public async Task<Result<User>> FindUserAsync(int id)
-        {
-            try
-            {
-                return Result<User>.CreateSuccess(await _db.Users.FirstOrDefaultAsync(u => u.Id == id));
-            }
-            catch (Exception e)
-            {
-                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
+                return Result<bool>.CreateFailed(CommonResultConstants.Unexpected, e);
             }
         }
     }
