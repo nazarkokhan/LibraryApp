@@ -77,7 +77,7 @@ namespace LibraryApp.DAL.Repository
             try
             {
                 var userEntity = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Id == int.Parse(userDto.Id));
+                    .FirstOrDefaultAsync(u => u.Id == userDto.Id);
 
                 if (userEntity is null)
                     return Result<User>.CreateFailed(

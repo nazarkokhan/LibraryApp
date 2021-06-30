@@ -2,7 +2,7 @@
 {
     public class EditUserDto
     {
-        public EditUserDto(string newEmail, int newAge, string newPassword, string id)
+        public EditUserDto(string newEmail, int newAge, string newPassword, int id)
         {
             NewEmail = newEmail;
             NewAge = newAge;
@@ -16,6 +16,6 @@
 
         public string NewPassword { get; }
 
-        public string Id { get; }
+        public int Id { get; }
     }
 }

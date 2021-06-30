@@ -40,7 +40,7 @@ namespace LibraryApp.BLL.Services
             try
             {
                 var userEntity = await _userManager
-                    .FindByEmailAsync(editUserDto.Id);
+                    .FindByEmailAsync(editUserDto.Id.ToString());
 
                 if (userEntity is null)
                     return Result<User>.CreateFailed(

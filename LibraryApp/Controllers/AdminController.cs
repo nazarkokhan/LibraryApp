@@ -23,7 +23,7 @@ namespace LibraryApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsersPage(
             [FromQuery] string? search,
-            [FromQuery][Range(1, int.MaxValue)] int page = 1, 
+            [FromQuery] [Range(1, int.MaxValue)] int page = 1,
             [FromQuery] int items = 5)
         {
             return (await _adminService.GetUsersPageAsync(search, page, items)).ToActionResult();
@@ -42,7 +42,7 @@ namespace LibraryApp.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUsers([Range(0, int.MaxValue)] int id) 
+        public async Task<IActionResult> DeleteUsers([Range(0, int.MaxValue)] int id)
         {
             return (await _adminService.DeleteUserAsync(id)).ToActionResult();
         }

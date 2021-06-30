@@ -8,7 +8,9 @@ namespace LibraryApp.DAL.Repository
     {
         private readonly LibContext _db;
 
-        public EfUnitOfWork(LibContext context, IAuthorRepository authorRepository, IBookRepository bookRepository, IUserRepository users)
+        public EfUnitOfWork(
+            LibContext context, IAuthorRepository authorRepository, 
+            IBookRepository bookRepository, IUserRepository users)
         {
             _db = context;
             Authors = authorRepository;

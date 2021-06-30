@@ -21,9 +21,9 @@ namespace LibraryApp.BLL.Tests
     {
         private readonly IAccountService _accountService;
         private readonly Mock<UserManager<User>> _userManagerMock;
-        private readonly Mock<IUserStore<User>> _userStoreMock = new Mock<IUserStore<User>>();
-        private readonly Mock<IUnitOfWork> _unitOfWorkMock = new Mock<IUnitOfWork>();
-        private readonly Mock<IEmailService> _emailServiceMock = new Mock<IEmailService>();
+        private readonly Mock<IUserStore<User>> _userStoreMock = new();
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+        private readonly Mock<IEmailService> _emailServiceMock = new();
 
         public AccountServiceTests()
         {
