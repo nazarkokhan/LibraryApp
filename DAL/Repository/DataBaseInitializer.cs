@@ -29,7 +29,8 @@ namespace LibraryApp.DAL.Repository
         
         private readonly IHostEnvironment _hostEnvironment;
 
-        public DataBaseInitializer(LibContext db, RoleManager<Entities.Role> roleManager, UserManager<User> userManager, IHostEnvironment hostEnvironment)
+        public DataBaseInitializer(LibContext db, RoleManager<Entities.Role> roleManager, 
+            UserManager<User> userManager, IHostEnvironment hostEnvironment)
         {
             _db = db;
             _roleManager = roleManager;
