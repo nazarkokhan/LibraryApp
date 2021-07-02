@@ -56,7 +56,9 @@ namespace LibraryApp
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IAdminService, AdminService>()
                 .AddSingleton<IEmailService, EmailService>()
+                .AddLogging(builder => builder.AddFile("logs/log.log", fileSizeLimitBytes: 100_000))
                 .AddControllers(options => options.Filters.Add<ErrorableResultFilterAttribute>());
+                
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

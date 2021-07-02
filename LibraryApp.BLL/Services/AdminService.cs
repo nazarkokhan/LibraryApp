@@ -35,39 +35,6 @@ namespace LibraryApp.BLL.Services
             return await _unitOfWork.Users.GetUserAsync(id);
         }
 
-        public async Task<Result<User>> EditUserAsyncOld(EditUserDto editUserDto)
-        {
-            try
-            {
-                var userEntity = await _userManager
-                    .FindByEmailAsync(editUserDto.Id.ToString());
-
-                if (userEntity is null)
-                    return Result<User>.CreateFailed(
-                        AccountResultConstants.UserNotFound,
-                        new NullReferenceException()
-                    );
-
-                userEntity.Email = editUserDto.NewEmail;
-
-                userEntity.UserName = editUserDto.NewEmail;
-
-                userEntity.Age = editUserDto.NewAge;
-
-                await _userManager.RemovePasswordAsync(userEntity);
-
-                var addPass = await _userManager.AddPasswordAsync(userEntity, editUserDto.NewPassword);
-
-                return !addPass.Succeeded
-                    ? Result<User>.CreateFailed("Error adding new password")
-                    : Result<User>.CreateSuccess(userEntity);
-            }
-            catch (Exception e)
-            {
-                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
-        }
-        
         public async Task<Result<User>> EditUserAsync(EditUserDto editUserDto)
         {
             try

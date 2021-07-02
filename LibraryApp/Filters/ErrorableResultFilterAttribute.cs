@@ -6,7 +6,6 @@ using LibraryApp.Core.ResultModel.Abstraction.Generics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace LibraryApp.Filters
@@ -22,10 +21,9 @@ namespace LibraryApp.Filters
             {
                 if (!actionResult.Result.Success)
                 {
-                    var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<ErrorableResultFilterAttribute>>();
                     var error = new SerializableError
                     {
-                        { Errors, actionResult.Result.Messages.Select(m => localizer[m].Value) }
+                        { Errors, actionResult.Result.Messages }
                     };
 
                     context.Result = new BadRequestObjectResult(error);

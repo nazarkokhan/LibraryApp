@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
+using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
@@ -32,7 +33,13 @@ namespace LibraryApp.BLL.Tests
             {
                 new() {Email = "admin@gmail.com", Age = 20},
                 new() {Email = "user@gmail.com", Age = 25},
-                new() {Email = "user2@gmail.com", Age = 30}
+                new() {Email = "use2@gmail.com", Age = 30},
+                new() {Email = "user3@gmail.com", Age = 25},
+                new() {Email = "user4@gmail.com", Age = 25},
+                new() {Email = "user5@gmail.com", Age = 25},
+                new() {Email = "user6@gmail.com", Age = 25},
+                new() {Email = "user7@gmail.com", Age = 25},
+                new() {Email = "user8@gmail.com", Age = 30}
             };
 
             var dbContextOptions = new DbContextOptionsBuilder<LibContext>()
@@ -68,6 +75,7 @@ namespace LibraryApp.BLL.Tests
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
+        [InlineData(3)]
         public async Task GetUserAsync_Id_SuccessUserReturned(int id)
         {
             var actual = await _userRepository.GetUserAsync(id);
@@ -82,8 +90,9 @@ namespace LibraryApp.BLL.Tests
         }
 
         [Theory]
-        [InlineData(83)]
-        [InlineData(999)]
+        [InlineData(8393)]
+        [InlineData(9991)]
+        [InlineData(1932)]
         public async Task GetUserAsync_Id_FailUserNotFoundReturned(int id)
         {
             var actual = await _userRepository.GetUserAsync(id);
@@ -120,9 +129,9 @@ namespace LibraryApp.BLL.Tests
         }
 
         [Theory]
-        [InlineData("admin@gmail.com", 50, "adminAccess", 98)]
-        [InlineData("user@gmail.com", 10, "userAccess", 28)]
-        [InlineData("user2@gmail.com", 70, "userAccess", 33)]
+        [InlineData("admin@gmail.com", 50, "adminAccess", 988)]
+        [InlineData("user@gmail.com", 10, "userAccess", 238)]
+        [InlineData("user2@gmail.com", 70, "userAccess", 308)]
         public async Task EditUserAsync_EditUserDto_FailUserNotFoundReturned(
             string newEmail, int newAge, string newPassword, int id)
         {
@@ -153,9 +162,44 @@ namespace LibraryApp.BLL.Tests
 
             Assert.NotNull(actual);
             Assert.Null(actual.Exception);
-            Assert.False(actual.Success);
+            Assert.True(actual.Success);
             Assert.Equal(expected.Success, actual.Success);
             Assert.Equal(expected.Data, actual.Data);
+        }
+        
+        [Theory]
+        [InlineData(5)]
+        [InlineData(7)]
+        [InlineData(9)]
+        public async Task DeleteUserAsync_Id_SuccessReturned(int id)
+        {
+            var actual = await _userRepository.DeleteUserAsync(id);
+
+            var expected = Result.CreateSuccess();
+
+            Assert.NotNull(actual);
+            Assert.Null(actual.Exception);
+            Assert.True(actual.Success);
+            Assert.Equal(expected.Success, actual.Success);
+        }
+        
+        [Theory]
+        [InlineData(5137)]
+        [InlineData(7533)]
+        [InlineData(9311)]
+        public async Task DeleteUserAsync_Id_FailUserNotFoundReturned(int id)
+        {
+            var actual = await _userRepository.DeleteUserAsync(id);
+
+            var expected = Result.CreateFailed(
+                AccountResultConstants.UserNotFound,
+                new NullReferenceException()
+            );
+
+            Assert.NotNull(actual);
+            Assert.NotNull(actual.Exception);
+            Assert.False(actual.Success);
+            Assert.Equal(expected.Success, actual.Success);
         }
     }
 }
