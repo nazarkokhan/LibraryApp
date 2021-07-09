@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 
 namespace LibraryApp.Core.DTO.Authorization
 {
@@ -17,45 +16,11 @@ namespace LibraryApp.Core.DTO.Authorization
         public string Email { get; }
 
         [Required]
-        [Password]
+        [DataType(DataType.Password)]
         public string Password { get; }
 
         [Required] 
         [Range(0, 150)] 
         public int Age { get; }
-    }
-
-    public class MyDataTypeAttribute : DataTypeAttribute
-    {
-        public MyDataTypeAttribute(DataType dataType) : base(dataType)
-        {
-        }
-
-        public MyDataTypeAttribute(string customDataType) : base(customDataType)
-        {
-        }
-
-        public override bool IsValid(object? value)
-        {
-            if (CustomDataType is "MyPassword" && value is string strValue)
-            {
-                return strValue.Length >= IdentityPasswordConstants.RequiredLength;
-            }
-
-            return false;
-        }
-    }
-
-    public class Password : ValidationAttribute
-    {
-        public override bool IsValid(object? value)
-        {
-            if (value is string strValue)
-            {
-                return strValue.Length >= IdentityPasswordConstants.RequiredLength;
-            }
-
-            return false;
-        }
     }
 }

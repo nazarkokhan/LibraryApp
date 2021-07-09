@@ -2,6 +2,7 @@
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LibraryApp.Extensions
@@ -33,5 +34,8 @@ namespace LibraryApp.Extensions
                 ValidateIssuerSigningKey = true,
             };
         }
+
+        public static string GetLogFileName(this IConfiguration configuration) 
+            => configuration.GetSection("FileLogging")["FileName"];
     }
 }

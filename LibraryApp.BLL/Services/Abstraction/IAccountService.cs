@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.DTO.Authorization.Reset;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 

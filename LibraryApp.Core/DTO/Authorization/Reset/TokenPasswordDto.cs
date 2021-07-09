@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
-namespace LibraryApp.Core.DTO.Authorization
+namespace LibraryApp.Core.DTO.Authorization.Reset
 {
     public class TokenPasswordDto
     {
@@ -18,19 +19,10 @@ namespace LibraryApp.Core.DTO.Authorization
         [DataType(DataType.Password)] 
         public string NewPassword { get; }
 
+        [DataMember]
         [Compare("NewPassword", ErrorMessage = "Passwords have to be equal")]
         public string ConfirmNewPassword { get; }
 
         public string Token { get; }
-    }
-
-    public class ResetPasswordDto
-    {
-        public ResetPasswordDto(string email)
-        {
-            Email = email;
-        }
-
-        [DataType(DataType.EmailAddress)] public string Email { get; }
     }
 }

@@ -5,7 +5,6 @@ using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
 using LibraryApp.Core.ResultConstants;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
-using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository.Abstraction;

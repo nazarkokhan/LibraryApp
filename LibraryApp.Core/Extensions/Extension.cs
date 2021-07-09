@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace LibraryApp.Core.Extensions
 {
-    public static class LocalLinq
+    public static class Extension
     {
         public static async Task ForEachAsync<T>(this IEnumerable<T> enumerable, Func<T, Task> func)
         {
@@ -18,10 +18,5 @@ namespace LibraryApp.Core.Extensions
                 .Skip((page - 1) * items)
                 .Take(items);
         }
-        
-        // public static IQueryable<T> Search<T>(this IQueryable<T> queryable, string search)
-        // {
-        //     return queryable.
-        // }
     }
 }

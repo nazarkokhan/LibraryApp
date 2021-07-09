@@ -24,9 +24,7 @@ namespace LibraryApp.DAL.Repository
         
         public IUserRepository Users { get; }
 
-        public Task SaveAsync()
-        {
-            return _db.SaveChangesAsync();
-        }
+        public Task SaveAsync() 
+            => _db.SaveChangesAsync();
     }
 }

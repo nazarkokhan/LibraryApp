@@ -25,15 +25,11 @@ namespace LibraryApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items)
-        {
-            return await _unitOfWork.Users.GetUsersPageAsync(search, page, items);
-        }
+        public Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items) 
+            => _unitOfWork.Users.GetUsersPageAsync(search, page, items);
 
-        public async Task<Result<User>> GetUserAsync(int id)
-        {
-            return await _unitOfWork.Users.GetUserAsync(id);
-        }
+        public Task<Result<User>> GetUserAsync(int id) 
+            => _unitOfWork.Users.GetUserAsync(id);
 
         public async Task<Result<User>> EditUserAsync(EditUserDto editUserDto)
         {
@@ -63,9 +59,7 @@ namespace LibraryApp.BLL.Services
             }
         }
 
-        public async Task<Result> DeleteUserAsync(int id)
-        {
-            return await _unitOfWork.Users.DeleteUserAsync(id);
-        }
+        public Task<Result> DeleteUserAsync(int id) 
+            => _unitOfWork.Users.DeleteUserAsync(id);
     }
 }

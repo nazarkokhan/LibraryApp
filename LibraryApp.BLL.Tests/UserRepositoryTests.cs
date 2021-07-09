@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
 using LibraryApp.Core.DTO.Authorization;
@@ -11,13 +10,9 @@ using LibraryApp.DAL.EF;
 using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository;
 using LibraryApp.DAL.Repository.Abstraction;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
-using Role = LibraryApp.DAL.Entities.Role;
 
 namespace LibraryApp.BLL.Tests
 {

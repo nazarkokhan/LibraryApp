@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Author;
 using LibraryApp.Core.Extensions;
 using LibraryApp.Core.ResultConstants;
 using LibraryApp.Core.ResultModel;

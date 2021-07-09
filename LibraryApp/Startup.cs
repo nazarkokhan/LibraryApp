@@ -40,7 +40,7 @@ namespace LibraryApp
 
             services
                 .AddDbContext<LibContext>(options => options
-                    .UseSqlServer(Configuration.GetConnectionString($"{nameof(LibContext)}"))
+                    .UseSqlServer(Configuration.GetConnectionString(nameof(LibContext)))
                     .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole()))
                 );
 
@@ -56,14 +56,14 @@ namespace LibraryApp
                 .AddScoped<IAccountService, AccountService>()
                 .AddScoped<IAdminService, AdminService>()
                 .AddSingleton<IEmailService, EmailService>()
-                .AddLogging(builder => builder.AddFile("logs/log.log", fileSizeLimitBytes: 100_000))
+                .AddLogging(builder => builder.AddFile(Configuration.GetLogFileName(), fileSizeLimitBytes: 100_000))
                 .AddControllers(options => options.Filters.Add<ErrorableResultFilterAttribute>());
-                
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment()) 
+                app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
 

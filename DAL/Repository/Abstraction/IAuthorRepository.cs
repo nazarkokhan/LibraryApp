@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LibraryApp.Core.DTO;
+using LibraryApp.Core.DTO.Author;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 

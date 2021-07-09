@@ -23,10 +23,13 @@ namespace LibraryApp.BLL.Services
             };
         }
 
-        public async Task SendAsync(string to, string body, string subject = "")
-        {
-            
-            await _smtpClient.SendMailAsync(_configuration["EmailSettings:Email"], to, subject, body);
-        }
+        public Task SendAsync(string to, string body, string? subject) 
+            => _smtpClient
+                .SendMailAsync(
+                    _configuration["EmailSettings:Email"],
+                    to,
+                    subject ?? string.Empty,
+                    body
+                );
     }
 }

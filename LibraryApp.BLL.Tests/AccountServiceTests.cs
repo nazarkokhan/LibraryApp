@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LibraryApp.BLL.Services;
 using LibraryApp.BLL.Services.Abstraction;
 using LibraryApp.Core.DTO.Authorization;
+using LibraryApp.Core.DTO.Authorization.Reset;
 using LibraryApp.Core.ResultConstants;
 using LibraryApp.Core.ResultConstants.AuthorizationConstants;
 using LibraryApp.Core.ResultModel;
