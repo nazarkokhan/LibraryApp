@@ -4,24 +4,23 @@ using LibraryApp.Core.DTO.Authorization.Reset;
 using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 
-namespace LibraryApp.BLL.Services.Abstraction
+namespace LibraryApp.BLL.Services.Abstraction;
+
+public interface IAccountService
 {
-    public interface IAccountService
-    {
-        Task<Result> CreateUserAndSendEmailTokenAsync(RegisterDto register);
+    Task<Result> CreateUserAndSendEmailTokenAsync(RegisterDto register);
 
-        Task<Result> ConfirmRegistrationAsync(string token, string userId);
+    Task<Result> ConfirmRegistrationAsync(string token, string userId);
         
-        Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput);
+    Task<Result<Token>> GetAccessTokenAsync(LogInUserDto userInput);
 
-        Task<Result<ProfileDto>> GetProfile(int userId);
+    Task<Result<ProfileDto>> GetProfile(int userId);
 
-        Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto, int userId);
+    Task<Result> SendEmailResetTokenAsync(ResetEmailDto resetEmailDto, int userId);
 
-        Task<Result> ResetEmailAsync(string token, string newEmail, int userId);
+    Task<Result> ResetEmailAsync(string token, string newEmail, int userId);
 
-        Task<Result> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);
+    Task<Result> SendPasswordResetTokenAsync(ResetPasswordDto resetPasswordDto);
 
-        Task<Result> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto);
-    }
+    Task<Result> ResetPasswordAsync(TokenPasswordDto tokenPasswordDto);
 }

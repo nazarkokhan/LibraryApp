@@ -13,131 +13,130 @@ using LibraryApp.DAL.Entities;
 using LibraryApp.DAL.Repository.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryApp.DAL.Repository
+namespace LibraryApp.DAL.Repository;
+
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly LibContext _db;
+
+    public UserRepository(LibContext context)
     {
-        private readonly LibContext _db;
-
-        public UserRepository(LibContext context)
-        {
-            _db = context;
-        }
+        _db = context;
+    }
         
-        public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items)
+    public async Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items)
+    {
+        try
         {
-            try
-            {
-                var totalCount = await _db.Users
-                    .CountAsync();
+            var totalCount = await _db.Users
+                .CountAsync();
 
-                var userEntities = _db.Users
-                    .OrderBy(a => a.Id)
-                    .TakePage(page, items);
+            var userEntities = _db.Users
+                .OrderBy(a => a.Id)
+                .TakePage(page, items);
 
-                if (!string.IsNullOrWhiteSpace(search))
-                    userEntities = userEntities
-                        .Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
+            if (!string.IsNullOrWhiteSpace(search))
+                userEntities = userEntities
+                    .Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
 
-                return Result<Pager<User>>.CreateSuccess(
-                    new Pager<User>(
-                        await userEntities.ToListAsync(),
-                        totalCount
-                    )
+            return Result<Pager<User>>.CreateSuccess(
+                new Pager<User>(
+                    await userEntities.ToListAsync(),
+                    totalCount
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            return Result<Pager<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
+        }
+    }
+        
+    public async Task<Result<User>> GetUserAsync(int id)
+    {
+        try
+        {
+            var userEntity = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return userEntity is null
+                ? Result<User>.CreateFailed(
+                    AccountResultConstants.UserNotFound,
+                    new NullReferenceException()
+                )
+                : Result<User>.CreateSuccess(userEntity);
+        }
+        catch (Exception e)
+        {
+            return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
+        }
+    }
+
+    public async Task<Result<User>> EditUserAsync(EditUserDto userDto)
+    {
+        try
+        {
+            var userEntity = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+            if (userEntity is null)
+                return Result<User>.CreateFailed(
+                    AccountResultConstants.UserNotFound,
+                    new NullReferenceException()
                 );
-            }
-            catch (Exception e)
-            {
-                return Result<Pager<User>>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
-        }
-        
-        public async Task<Result<User>> GetUserAsync(int id)
-        {
-            try
-            {
-                var userEntity = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Id == id);
 
-                return userEntity is null
-                    ? Result<User>.CreateFailed(
-                        AccountResultConstants.UserNotFound,
-                        new NullReferenceException()
-                    )
-                    : Result<User>.CreateSuccess(userEntity);
-            }
-            catch (Exception e)
-            {
-                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
-        }
+            userEntity.Email = userDto.NewEmail;
 
-        public async Task<Result<User>> EditUserAsync(EditUserDto userDto)
-        {
-            try
-            {
-                var userEntity = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Id == userDto.Id);
+            userEntity.UserName = userDto.NewEmail;
 
-                if (userEntity is null)
-                    return Result<User>.CreateFailed(
-                        AccountResultConstants.UserNotFound,
-                        new NullReferenceException()
-                    );
+            userEntity.Age = userDto.NewAge;
 
-                userEntity.Email = userDto.NewEmail;
-
-                userEntity.UserName = userDto.NewEmail;
-
-                userEntity.Age = userDto.NewAge;
-
-                await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
                     
-                return Result<User>.CreateSuccess(userEntity);
-            }
-            catch (Exception e)
-            {
-                return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
+            return Result<User>.CreateSuccess(userEntity);
         }
-
-        public async Task<Result> DeleteUserAsync(int id)
+        catch (Exception e)
         {
-            try
-            {
-                var userEntity = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Id == id);
-
-                if (userEntity is null)
-                    return Result.CreateFailed(
-                        AccountResultConstants.UserNotFound,
-                        new NullReferenceException()
-                    );
-
-                _db.Users.Remove(userEntity);
-
-                await _db.SaveChangesAsync();
-
-                return Result.CreateSuccess();
-            }
-            catch (Exception e)
-            {
-                return Result.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
+            return Result<User>.CreateFailed(CommonResultConstants.Unexpected, e);
         }
-        
-        public async Task<Result<bool>> UserExistsAsync(string email)
+    }
+
+    public async Task<Result> DeleteUserAsync(int id)
+    {
+        try
         {
-            try
-            {
-                return Result<bool>.CreateSuccess(
-                    await _db.Users.AnyAsync(u => u.Email == email)
+            var userEntity = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (userEntity is null)
+                return Result.CreateFailed(
+                    AccountResultConstants.UserNotFound,
+                    new NullReferenceException()
                 );
-            }
-            catch (Exception e)
-            {
-                return Result<bool>.CreateFailed(CommonResultConstants.Unexpected, e);
-            }
+
+            _db.Users.Remove(userEntity);
+
+            await _db.SaveChangesAsync();
+
+            return Result.CreateSuccess();
+        }
+        catch (Exception e)
+        {
+            return Result.CreateFailed(CommonResultConstants.Unexpected, e);
+        }
+    }
+        
+    public async Task<Result<bool>> UserExistsAsync(string email)
+    {
+        try
+        {
+            return Result<bool>.CreateSuccess(
+                await _db.Users.AnyAsync(u => u.Email == email)
+            );
+        }
+        catch (Exception e)
+        {
+            return Result<bool>.CreateFailed(CommonResultConstants.Unexpected, e);
         }
     }
 }

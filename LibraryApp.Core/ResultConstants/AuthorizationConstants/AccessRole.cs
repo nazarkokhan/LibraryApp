@@ -3,7 +3,7 @@
 namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
 {
     [Flags]
-    public enum Role
+    public enum AccessRole
     {
         /// <summary>
         /// Represents User role.

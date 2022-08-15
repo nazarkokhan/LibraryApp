@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace LibraryApp.BLL.Services.Abstraction
+namespace LibraryApp.BLL.Services.Abstraction;
+
+public interface IEmailService
 {
-    public interface IEmailService
-    {
-        Task SendAsync(string to, string body, string? subject = null);
-    }
+    Task SendAsync(string to, string body, string? subject = null);
 }

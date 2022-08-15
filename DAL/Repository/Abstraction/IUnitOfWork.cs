@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 
-namespace LibraryApp.DAL.Repository.Abstraction
+namespace LibraryApp.DAL.Repository.Abstraction;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        IAuthorRepository Authors { get; }
+    IAuthorRepository Authors { get; }
 
-        IBookRepository Books { get; }
+    IBookRepository Books { get; }
         
-        IUserRepository Users { get; }
+    IUserRepository Users { get; }
 
-        Task SaveAsync();
-    }
+    Task SaveAsync();
 }

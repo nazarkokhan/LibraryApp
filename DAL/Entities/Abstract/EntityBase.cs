@@ -1,7 +1,6 @@
-﻿namespace LibraryApp.DAL.Entities.Abstract
+﻿namespace LibraryApp.DAL.Entities.Abstract;
+
+public abstract class EntityBase : IEntity<int>
 {
-    public abstract class EntityBase : IEntity<int>
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

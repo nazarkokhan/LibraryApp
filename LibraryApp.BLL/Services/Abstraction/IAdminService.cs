@@ -6,16 +6,15 @@ using LibraryApp.Core.ResultModel;
 using LibraryApp.Core.ResultModel.Generics;
 using LibraryApp.DAL.Entities;
 
-namespace LibraryApp.BLL.Services.Abstraction
+namespace LibraryApp.BLL.Services.Abstraction;
+
+public interface IAdminService
 {
-    public interface IAdminService
-    {
-        Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items);
+    Task<Result<Pager<User>>> GetUsersPageAsync(string? search, int page, int items);
 
-        Task<Result<User>> GetUserAsync([Range(0, int.MaxValue)] int id);
+    Task<Result<User>> GetUserAsync([Range(0, int.MaxValue)] int id);
 
-        Task<Result<User>> EditUserAsync(EditUserDto editUserDto);
+    Task<Result<User>> EditUserAsync(EditUserDto editUserDto);
 
-        Task<Result> DeleteUserAsync([Range(0, int.MaxValue)] int id);
-    }
+    Task<Result> DeleteUserAsync([Range(0, int.MaxValue)] int id);
 }

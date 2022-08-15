@@ -1,7 +1,6 @@
-﻿namespace LibraryApp.DAL.Entities.Abstract
+﻿namespace LibraryApp.DAL.Entities.Abstract;
+
+public interface IEntity<TKey>
 {
-    public interface IEntity<TKey>
-    {
-        TKey Id { get; set; }
-    }
+    TKey Id { get; set; }
 }
