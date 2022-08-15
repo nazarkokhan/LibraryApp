@@ -1,10 +1,9 @@
-﻿namespace LibraryApp.Core.ResultConstants
+﻿namespace LibraryApp.Core.ResultConstants;
+
+public static class AuthorRepositoryResultConstants
 {
-    public static class AuthorRepositoryResultConstants
-    {
-        /// <summary>
-        /// Represents message when author was not found.
-        /// </summary>
-        public const string AuthorNotFound = "AUTHOR_NOT_FOUND";
-    }
+    /// <summary>
+    /// Represents message when author was not found.
+    /// </summary>
+    public const string AuthorNotFound = "AUTHOR_NOT_FOUND";
 }

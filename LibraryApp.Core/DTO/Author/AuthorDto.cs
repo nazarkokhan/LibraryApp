@@ -1,15 +1,3 @@
-﻿namespace LibraryApp.Core.DTO.Author
-{
-    public class AuthorDto
-    {
-        public AuthorDto(int id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
+﻿namespace LibraryApp.Core.DTO.Author;
 
-        public int Id { get; }
-
-        public string Name { get; }
-    }
-}
+public record AuthorDto(int Id, string Name);

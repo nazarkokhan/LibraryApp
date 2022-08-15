@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LibraryApp.Core.DTO.Authorization.Reset
-{
-    public class ResetPasswordDto
-    {
-        public ResetPasswordDto(string email)
-        {
-            Email = email;
-        }
+namespace LibraryApp.Core.DTO.Authorization.Reset;
 
-        [DataType(DataType.EmailAddress)] 
-        public string Email { get; }
+public class ResetPasswordDto
+{
+    public ResetPasswordDto(string email)
+    {
+        Email = email;
     }
+
+    [DataType(DataType.EmailAddress)] 
+    public string Email { get; }
 }

@@ -10,12 +10,14 @@ using Extensions;
 using Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Other;
 
 public class Startup
 {
@@ -33,16 +35,19 @@ public class Startup
             .AddJwtBearer(options => options.JwtBearerOptions());
 
         services
+            .AddSwaggerGen();
+
+        services
             .AddIdentity<User, Role>(options => options.ConfigurePassword())
             .AddUserManager<UserManager<User>>()
             .AddEntityFrameworkStores<LibContext>()
             .AddDefaultTokenProviders();
 
         services
-            .AddDbContext<LibContext>(options => options
-                .UseSqlServer(Configuration.GetConnectionString(nameof(LibContext)))
-                .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole()))
-            );
+            .AddDbContext<LibContext>(
+                options => options
+                    .UseNpgsql(Configuration.GetConnectionString(nameof(LibContext)))
+                    .UseLoggerFactory(LoggerFactory.Create(lb => lb.AddConsole())));
 
         services
             .AddHttpContextAccessor()
@@ -56,13 +61,14 @@ public class Startup
             .AddScoped<IAccountService, AccountService>()
             .AddScoped<IAdminService, AdminService>()
             .AddSingleton<IEmailService, EmailService>()
+            .AddScoped<IDatabaseSeeder, DatabaseSeeder>()
             .AddLogging(builder => builder.AddFile(Configuration.GetLogFileName(), fileSizeLimitBytes: 100_000))
             .AddControllers(options => options.Filters.Add<ErrorableResultFilterAttribute>());
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment()) 
+        if (env.IsDevelopment())
             app.UseDeveloperExceptionPage();
 
         app.UseSwagger();
@@ -72,6 +78,13 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseDatabaseSeeder();
+
+        app.UseEndpoints(
+            endpoints =>
+            {
+                endpoints.MapGet("/", async context => { await context.Response.WriteAsync($"{env.EnvironmentName} Library app"); });
+                endpoints.MapControllers();
+            });
     }
 }

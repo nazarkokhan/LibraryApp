@@ -1,10 +1,9 @@
-namespace LibraryApp.Core.ResultConstants.AuthorizationConstants
+namespace LibraryApp.Core.ResultConstants.AuthorizationConstants;
+
+public static class IdentityPasswordConstants
 {
-    public static class IdentityPasswordConstants
-    {
-        /// <summary>
-        /// Represents required lenght of password.
-        /// </summary>
-        public const int RequiredLength = 6;
-    }
+    /// <summary>
+    /// Represents required lenght of password.
+    /// </summary>
+    public const int RequiredLength = 6;
 }

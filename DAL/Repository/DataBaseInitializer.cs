@@ -15,7 +15,7 @@ public class DataBaseInitializer
 {
     private readonly LibContext _db;
 
-    private readonly RoleManager<Entities.Role> _roleManager;
+    private readonly RoleManager<Role> _roleManager;
 
     private readonly UserManager<User> _userManager;
 
@@ -23,14 +23,14 @@ public class DataBaseInitializer
 
     private readonly List<Book> _books;
 
-    private readonly List<Entities.Role> _roles;
+    private readonly List<Role> _roles;
 
     private readonly List<RegisterDto> _users;
 
 
     public DataBaseInitializer(
         LibContext db,
-        RoleManager<Entities.Role> roleManager,
+        RoleManager<Role> roleManager,
         UserManager<User> userManager)
     {
         _db = db;
@@ -51,7 +51,7 @@ public class DataBaseInitializer
             new() {Name = "Tri Porosenka"}
         };
 
-        _roles ??= new List<Entities.Role>
+        _roles ??= new List<Role>
         {
             new() {Name = AccessRole.Admin.ToString(), RoleDescription = "Has a admin access"},
             new() {Name = AccessRole.User.ToString(), RoleDescription = "Role for all registered users"}

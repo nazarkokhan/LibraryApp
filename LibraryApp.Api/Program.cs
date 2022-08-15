@@ -1,11 +1,8 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 namespace LibraryApp.Api;
 
-using DAL.Repository;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 public static class Program
 {
@@ -13,10 +10,10 @@ public static class Program
     {
         var host = CreateHostBuilder(args).Build();
 
-        using (var scope = host.Services.CreateScope())
-        {
-            await scope.ServiceProvider.GetRequiredService<DataBaseInitializer>().InitializeDbAsync();
-        }
+        // using (var scope = host.Services.CreateScope())
+        // {
+        //     await scope.ServiceProvider.GetRequiredService<DataBaseInitializer>().InitializeDbAsync();
+        // }
 
         await host.RunAsync();
     }

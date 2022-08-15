@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LibraryApp.Core.ResultModel.Abstraction
+namespace LibraryApp.Core.ResultModel.Abstraction;
+
+public interface IResult
 {
-    public interface IResult
-    {
-        IReadOnlyCollection<string> Messages { get; }
+    IReadOnlyCollection<string> Messages { get; }
 
-        bool Success { get; }
+    bool Success { get; }
 
-        Exception? Exception { get; }
-    }
+    Exception? Exception { get; }
 }

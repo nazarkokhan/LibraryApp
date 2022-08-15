@@ -1,17 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace LibraryApp.Core.DTO.Author;
 
-namespace LibraryApp.Core.DTO.Author
+using System.ComponentModel.DataAnnotations;
+
+public class CreateAuthorDto
 {
-    public class CreateAuthorDto
+    public CreateAuthorDto(string name)
     {
-        public CreateAuthorDto(string name)
-        {
-            Name = name;
-        }
-
-        [Required]
-        [MinLength(1)]
-        [MaxLength(1000)]
-        public string Name { get; }
+        Name = name;
     }
+
+    [Required]
+    [MinLength(1)]
+    [MaxLength(1000)]
+    public string Name { get; }
 }

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using LibraryApp.Api.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Api.Controllers;
@@ -10,7 +9,6 @@ using Abstract;
 using BLL.Services.Abstraction;
 using Core.DTO.Author;
 using Core.ResultConstants.AuthorizationConstants;
-using DAL.Entities;
 
 [BearerAuthorize(AccessRole.User | AccessRole.Admin)]
 public class AuthorController : ApiController

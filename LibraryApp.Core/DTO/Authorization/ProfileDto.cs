@@ -1,15 +1,14 @@
-﻿namespace LibraryApp.Core.DTO.Authorization
+﻿namespace LibraryApp.Core.DTO.Authorization;
+
+public class ProfileDto
 {
-    public class ProfileDto
+    public ProfileDto(int id, string email)
     {
-        public ProfileDto(int id, string email)
-        {
-            Id = id;
-            Email = email;
-        }
-
-        public int Id { get; }
-
-        public string Email { get; }
+        Id = id;
+        Email = email;
     }
+
+    public int Id { get; }
+
+    public string Email { get; }
 }

@@ -1,12 +1,11 @@
-﻿namespace LibraryApp.Core.DTO.Authorization
-{
-    public class Token
-    {
-        public Token(string jwtToken)
-        {
-            JwtToken = jwtToken;
-        }
+﻿namespace LibraryApp.Core.DTO.Authorization;
 
-        public string JwtToken { get; }
+public class Token
+{
+    public Token(string jwtToken)
+    {
+        JwtToken = jwtToken;
     }
+
+    public string JwtToken { get; }
 }

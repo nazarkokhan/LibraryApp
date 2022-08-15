@@ -1,7 +1,6 @@
-﻿namespace LibraryApp.Core.ResultModel.Abstraction.Generics
+﻿namespace LibraryApp.Core.ResultModel.Abstraction.Generics;
+
+public interface IResult<out TData> : IResult
 {
-    public interface IResult<out TData> : IResult
-    {
-        TData Data { get; }
-    }
+    TData Data { get; }
 }
